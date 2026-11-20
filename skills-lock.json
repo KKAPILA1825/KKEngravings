@@ -1,0 +1,341 @@
+{
+  "version": 1,
+  "skills": {
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
+    },
+    "web-content-images-pipeline": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-content-images-pipeline/SKILL.md",
+      "computedHash": "e1dd59b0eccfa8f2cd3ce21a53e55130d61e5e9389ab0553fd6586f384f42418"
+    },
+    "web-craft-anti-generic-design": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-anti-generic-design/SKILL.md",
+      "computedHash": "a1e7dbc4215411a28e86f10063bbccf12edaa0997990428d5b9d0421275d6354"
+    },
+    "web-craft-code-structure": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-code-structure/SKILL.md",
+      "computedHash": "81425286d3425b6a77ea9d76e2ecf96ec162b4db71de372335f2be5e6b33080f"
+    },
+    "web-craft-color-with-restraint": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-color-with-restraint/SKILL.md",
+      "computedHash": "f26fed9b696670994bd830d6c371cc1b0005e8420925d19acb4f5c8f2e86e1e6"
+    },
+    "web-craft-consistency-audit": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-consistency-audit/SKILL.md",
+      "computedHash": "0bca2eb8c842710d86d78e553e4ee7d95370b3f8d4ee9a3cdeeb99f5a8acbb34"
+    },
+    "web-craft-copy-that-sounds-human": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-copy-that-sounds-human/SKILL.md",
+      "computedHash": "31c521fbb1c282a0542824ead3b776c09547afe860ec774982be42ece9b06e94"
+    },
+    "web-craft-finishing-details": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-finishing-details/SKILL.md",
+      "computedHash": "de69671f778ff390ab936829fb7f1122352616a8f398780a56cf96ba92f9e2d9"
+    },
+    "web-craft-layout-with-intention": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-layout-with-intention/SKILL.md",
+      "computedHash": "275cd547f53cb7d6a54bf96bcc8de9d1afbc20beee6f3bdf1d2e10b9aca57768"
+    },
+    "web-craft-real-content": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-real-content/SKILL.md",
+      "computedHash": "94d48903e1f51d62fe450bdb74e69802690508053709cd2a9a616ece6254d217"
+    },
+    "web-craft-self-review": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-self-review/SKILL.md",
+      "computedHash": "0886c5f99e382b0b21c2d7fad12205e67180afc65d201ec420146ab784872a63"
+    },
+    "web-craft-typography-with-character": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-craft-typography-with-character/SKILL.md",
+      "computedHash": "af36ca2a307e4a65bb50dcc78d7a5fd614465be2f5d1d36fe3dee7d76c00e951"
+    },
+    "web-css-aspect-ratio-media": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-aspect-ratio-media/SKILL.md",
+      "computedHash": "588f8f8002a86e8bd5d7f8727b6e019992ae11e394167689e7f276426bfdf8e7"
+    },
+    "web-css-container-queries": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-container-queries/SKILL.md",
+      "computedHash": "4f8d3f3c079428afaa6de24ae93753d9442bb66b1223c4a9d08ba192222d9598"
+    },
+    "web-css-flexbox-patterns": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-flexbox-patterns/SKILL.md",
+      "computedHash": "a07dd485e69c2a6258006c6aa4e42bb83d72e9ab8699d1c965c2633fa5178c41"
+    },
+    "web-css-fluid-typography": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-fluid-typography/SKILL.md",
+      "computedHash": "1f6413abb4341018769188014be7b8c76f13661a5a16661c92c2c46a7637a774"
+    },
+    "web-css-layers-and-organization": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-layers-and-organization/SKILL.md",
+      "computedHash": "2172fdd107ed4db46a3c016cfefaf3b5e692ccd071e0fbd47edd8d828f568a3a"
+    },
+    "web-css-modern-reset": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-modern-reset/SKILL.md",
+      "computedHash": "2f5ebfa571fbb613f8d9ea2ea0cf099893596b710f538f6ed6e651e92bda6bf3"
+    },
+    "web-css-responsive-grid": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-responsive-grid/SKILL.md",
+      "computedHash": "91e006096d09e04287ac1f2790e580ee3b1bf3ba10b5c664ad6055cb5ca60cc4"
+    },
+    "web-css-spacing-scale": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-spacing-scale/SKILL.md",
+      "computedHash": "712032d4bce180eb98dea19691bf3a116e03c71848b8a0ae8e390a94c51505a7"
+    },
+    "web-css-sticky-and-fixed": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-css-sticky-and-fixed/SKILL.md",
+      "computedHash": "fc375fbc2b0f1d08eed797cdce49e06b2eae920ca1669013dfaefa7aaa44ba03"
+    },
+    "web-data-sparklines": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-data-sparklines/SKILL.md",
+      "computedHash": "dee502c491f504a0e144e4e8d3903b46fc1f29245359b142c1a06a6e52cbfe16"
+    },
+    "web-data-svg-bar-chart": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-data-svg-bar-chart/SKILL.md",
+      "computedHash": "34a553941b40563d7789869ffb33f4bdc9e3c6dae5d7f854271e7f732a57c145"
+    },
+    "web-data-svg-line-chart": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-data-svg-line-chart/SKILL.md",
+      "computedHash": "d9ab18e06136fa6b110f7ebced6fcba6985757a163afe406dc3249548640fd86"
+    },
+    "web-data-table-export": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-data-table-export/SKILL.md",
+      "computedHash": "147aae03f10600168bd4d1f0b9b04b8a848adf8e3327bf7af032889d86dacc3d"
+    },
+    "web-design-borders-radius-dividers": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-borders-radius-dividers/SKILL.md",
+      "computedHash": "593aea92818f0ba988014cb60c445e93be475e1acce42ba87b8dd707d84cf8a9"
+    },
+    "web-design-color-system": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-color-system/SKILL.md",
+      "computedHash": "6a35ae5c9443cbeb57e32d92f6fa9e4d1f7df87a16e70b8445226a68736de846"
+    },
+    "web-design-dark-mode": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-dark-mode/SKILL.md",
+      "computedHash": "2f1b2b2a9d19df0be87fddc17a11cb9bfdab4cfb7d5b85df30167d8a2e875f8f"
+    },
+    "web-design-icons": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-icons/SKILL.md",
+      "computedHash": "2930a6b801c18d4b89757fe292a326aed8b91d737fd84ca4642d8664a499682a"
+    },
+    "web-design-images": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-images/SKILL.md",
+      "computedHash": "10bb3ec3afee08c3a9008dd5df3f1aee8cb73f9836cc1297579669f70f9657de"
+    },
+    "web-design-shadows-and-elevation": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-shadows-and-elevation/SKILL.md",
+      "computedHash": "464a9676be3ba0f5fc62186d1aa570dce307374acfc1b4e159ce4fcbdf230160"
+    },
+    "web-design-tokens-to-tailwind": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-tokens-to-tailwind/SKILL.md",
+      "computedHash": "bd323414e7a9b94c3204a5a2d98eb48603f229f67915540124fa083007548b68"
+    },
+    "web-design-typography-system": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-typography-system/SKILL.md",
+      "computedHash": "d5379fd9eaa9ff420bc5b2be860174c73ad56c40acdf2a077c30a864cd5680db"
+    },
+    "web-design-ui-polish-checklist": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-ui-polish-checklist/SKILL.md",
+      "computedHash": "a142a15fbbc66b89a5999b5851d2b75e03909974af0a339c408377b4f7aa3848"
+    },
+    "web-ecommerce-cart": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-cart/SKILL.md",
+      "computedHash": "7dbbf2e87cfa32f6fe53e748129db0ed90169a1970286ca54ff09423ed320bf7"
+    },
+    "web-ecommerce-checkout-stripe": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-checkout-stripe/SKILL.md",
+      "computedHash": "84cbcc9f53fd8a726b8e18124291edea08976a9ccd8a8406ec96471f05ebaea7"
+    },
+    "web-ecommerce-discount-codes": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-discount-codes/SKILL.md",
+      "computedHash": "892a03565b79cec034290143b4567425990aa1537e65c4912112b4a4e0cb65f9"
+    },
+    "web-ecommerce-order-status": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-order-status/SKILL.md",
+      "computedHash": "e5dd822b81634f9ecf17c1f16678156479dc4ec6cdc623ca41ae550ab5ef8b88"
+    },
+    "web-ecommerce-product-grid-filters": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-product-grid-filters/SKILL.md",
+      "computedHash": "c87ee9ecb35cfdb68f73b34c0b26dd5f9f6034c10caf61c7698b43e511c84ea4"
+    },
+    "web-ecommerce-reviews": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-reviews/SKILL.md",
+      "computedHash": "020a0287e24b402ab2f2b0c30a70a6df5c0683fc84fbc2d92255caed4f94545d"
+    },
+    "web-ecommerce-shipping-and-tax": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-shipping-and-tax/SKILL.md",
+      "computedHash": "e6046ca4642a31298e75d6e82fa1d3a731d3eea5052448924d9a529ed966e062"
+    },
+    "web-ecommerce-trust-and-conversion": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-trust-and-conversion/SKILL.md",
+      "computedHash": "5944e60c363a785470860f37c80b848516c89c2149a64af782fc334a4d8ce62e"
+    },
+    "web-ecommerce-variants-and-stock": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ecommerce-variants-and-stock/SKILL.md",
+      "computedHash": "9951bff21fbcfdb1644075dfb01570483bad81b9dc0e23eef05db4b4d1c6d6d0"
+    },
+    "web-section-gallery-masonry": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-section-gallery-masonry/SKILL.md",
+      "computedHash": "1a8321aaaa4a66d646fab7e34fcf2c4fc3b03631cc227b5ba92215fb877ee596"
+    },
+    "web-seo-structured-data": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-seo-structured-data/SKILL.md",
+      "computedHash": "31c932d37995c81bb328bee64fe12f567ecd0220f42e203931a1d1207bdeacc5"
+    },
+    "web-ship-project-setup": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ship-project-setup/SKILL.md",
+      "computedHash": "edc82e12aa462049f3244d71bd9a6a590137135351544fc366b556f7feea3fc6"
+    },
+    "web-ship-tailwind-production": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ship-tailwind-production/SKILL.md",
+      "computedHash": "3c3911aa77dddc15bb7afb131927d7fceb6bb3b76e36b5cf543523694bedc7ee"
+    },
+    "web-theme-switcher": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-theme-switcher/SKILL.md",
+      "computedHash": "afaa61bb841608c3f672156c0f383d809a6c5c66c4b57b6c127d0bb83340b0a3"
+    },
+    "web-tool-screenshot-diff": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-tool-screenshot-diff/SKILL.md",
+      "computedHash": "3f0ce4b332740ce7d38147d75d84ae48cd7c33232d39702116fac1ebda130919"
+    },
+    "web-tool-site-audit": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-tool-site-audit/SKILL.md",
+      "computedHash": "0336b05518a6a32db45ab6751d19cd861f0252667468f8802ecbe0ef4d4ae350"
+    },
+    "web-ui-accordion": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ui-accordion/SKILL.md",
+      "computedHash": "54e755dae6c4c59d626d56d5c266ceda423e0e4d99cd7dc56549de8c48cf96e4"
+    },
+    "web-ui-badges-chips-tags": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ui-badges-chips-tags/SKILL.md",
+      "computedHash": "563dcfb7576262485cb95fab439f39ccfff4eae3b02ba738ecd6325e68db1ced"
+    },
+    "web-ui-buttons": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ui-buttons/SKILL.md",
+      "computedHash": "d047dc3e33e2e1e8d0301f211c2ff61e33d64889c8ef056a73db064ec0b11228"
+    },
+    "web-ui-cards": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ui-cards/SKILL.md",
+      "computedHash": "ce67f1bb372d77ba125fbba2815dcab8b3e1b16fd6a69e40bac0f3305fa3955f"
+    },
+    "web-ui-carousel": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ui-carousel/SKILL.md",
+      "computedHash": "470b6eeafa018430850f03698f9011f0e023424b95c10996d1f6fad80d306c59"
+    },
+    "web-ui-data-table": {
+      "source": "therealvandad/claude-web-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-ui-data-table/SKILL.md",
+      "computedHash": "4ab89fff92af701764479ff805d95e1ea0ee7b78da448b08cfea1338edeb6055"
+    }
+  }
+}

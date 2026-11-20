@@ -1,0 +1,28 @@
+# deps
+node_modules
+
+# build output
+dist
+dist-ssr
+
+# generated optimized images (regenerated via `npm run images`)
+public/images
+
+# env / local
+.env
+.env.*.local
+*.local
+
+# editor / OS
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
