@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  --color-ivory: #F7F1E7;
+  --color-ivory-soft: #FBF6EC;
+  --color-ivory-deep: #EFE6D4;
+  --color-walnut: #6B4423;
+  --color-walnut-dark: #4A2E17;
+  --color-walnut-soft: #8A5A32;
+  --color-charcoal: #2B2A28;
+  --color-charcoal-soft: #4A4842;
+  --color-gold: #C9A961;
+  --color-gold-soft: #E0C98B;
+
+  --shadow-soft: 0 1px 2px rgb(43 42 40 / 0.06), 0 8px 24px -8px rgb(43 42 40 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(43 42 40 / 0.08), 0 20px 40px -12px rgb(43 42 40 / 0.18);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-ivory);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--color-walnut-dark);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  ::selection {
+    background: var(--color-gold-soft);
+    color: var(--color-walnut-dark);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Entrance animation used by sections on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subtle hero float */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
