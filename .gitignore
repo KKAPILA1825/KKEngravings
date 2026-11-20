@@ -4,6 +4,7 @@ node_modules
 # build output
 dist
 dist-ssr
+*.tsbuildinfo
 
 # generated optimized images (regenerated via `npm run images`)
 public/images
