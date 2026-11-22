@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode, FormEvent } from "react";
-import { AlertTriangle, ArrowLeft, Check, Mail, RefreshCw } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, Mail, RefreshCw, X } from "lucide-react";
 import { site } from "../../../data/site.config";
+import { photos } from "../../../data/photos";
+import type { Photo } from "../../../types";
+import { clearPicks, getPicks, removePick, togglePick, usePicks } from "../../../lib/gallery-picks";
 import { navigate, leaveOrders } from "../router";
 
 function Field({
@@ -31,15 +34,39 @@ const inputCls =
 
 type SendState = "idle" | "sending" | "success" | "mailto-opened" | "error";
 
+function buildReferencesBlock(refs: Photo[]): string {
+  if (refs.length === 0) return "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const lines = [`References (${refs.length}):`];
+  refs.forEach((p, i) => {
+    lines.push(`${i + 1}. ${p.title}`);
+    lines.push(`   ${origin}${p.full}`);
+  });
+  lines.push("");
+  return lines.join("\n");
+}
+
 function buildMailtoHref(
   name: string,
   email: string,
   occasion: string,
   idea: string,
+  refs: Photo[],
 ): string {
   const subject = `KK Engravings custom request from ${name || "a new customer"}`;
-  const body = `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "Not specified"}\n\nWhat I'd like:\n${idea}\n\nSent from the KK Engravings website.`;
+  const referencesBlock = buildReferencesBlock(refs);
+  const body = `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "Not specified"}\n\n${referencesBlock}What I'd like:\n${idea}\n\nSent from the KK Engravings website.`;
   return `mailto:${site.contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function readRefsFromHash(): string[] {
+  if (typeof window === "undefined") return [];
+  const q = window.location.hash.split("?")[1];
+  if (!q) return [];
+  const sp = new URLSearchParams(q);
+  const raw = sp.get("refs");
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
 export function CustomRequestPage() {
@@ -50,6 +77,28 @@ export function CustomRequestPage() {
   const [state, setState] = useState<SendState>("idle");
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
+  // On first mount, merge any ?refs=slug1,slug2 from the URL into the shared
+  // picks store. Unknown slugs silently dropped. Dedup preserved.
+  useEffect(() => {
+    const urlRefs = readRefsFromHash();
+    if (urlRefs.length === 0) return;
+    const valid = urlRefs.filter((slug) => photos.some((p) => p.slug === slug));
+    const existing = new Set(getPicks());
+    valid.forEach((slug) => {
+      if (!existing.has(slug)) togglePick(slug);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const picks = usePicks();
+  const resolvedRefs = useMemo<Photo[]>(
+    () =>
+      picks
+        .map((slug) => photos.find((p) => p.slug === slug))
+        .filter((p): p is Photo => Boolean(p)),
+    [picks],
+  );
+
   const canSend = site.contact.email.trim().length > 0;
 
   const resetForm = () => {
@@ -57,16 +106,19 @@ export function CustomRequestPage() {
     setEmail("");
     setIdea("");
     setOccasion("");
+    clearPicks();
   };
 
   const submitToNetlify = async (): Promise<void> => {
+    const referencesBlock = buildReferencesBlock(resolvedRefs);
+    const ideaWithRefs = referencesBlock ? `${referencesBlock}${idea}` : idea;
     const params = new URLSearchParams();
     params.set("form-name", "kk-engravings-custom");
     params.set("bot-field", "");
     params.set("customer_name", name);
     params.set("email", email);
     params.set("occasion", occasion);
-    params.set("idea", idea);
+    params.set("idea", ideaWithRefs);
     const res = await fetch("/", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -92,7 +144,8 @@ export function CustomRequestPage() {
   };
 
   const openMailtoLastResort = () => {
-    window.location.href = buildMailtoHref(name, email, occasion, idea);
+    window.location.href = buildMailtoHref(name, email, occasion, idea, resolvedRefs);
+    clearPicks();
     setState("mailto-opened");
   };
 
@@ -219,6 +272,44 @@ export function CustomRequestPage() {
               />
             </Field>
           </div>
+          {resolvedRefs.length > 0 && (
+            <div>
+              <span className="block text-sm font-medium text-[var(--color-walnut-dark)] mb-2">
+                Gallery references ({resolvedRefs.length})
+              </span>
+              <ul className="flex flex-wrap gap-2">
+                {resolvedRefs.map((p) => (
+                  <li
+                    key={p.slug}
+                    className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-full bg-[var(--color-ivory)] border border-[color-mix(in_oklab,var(--color-walnut)_25%,transparent)] text-sm text-[var(--color-walnut-dark)]"
+                  >
+                    <img
+                      src={p.thumb}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="size-7 rounded-full object-cover"
+                      loading="lazy"
+                      aria-hidden
+                    />
+                    <span className="max-w-[16rem] truncate">{p.title}</span>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${p.title}`}
+                      onClick={() => removePick(p.slug)}
+                      className="inline-flex items-center justify-center size-6 rounded-full text-[var(--color-charcoal-soft)] hover:bg-[var(--color-ivory-soft)] hover:text-red-700"
+                    >
+                      <X size={14} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <span className="block mt-2 text-xs text-[var(--color-charcoal-soft)]/70">
+                These photos are attached to your request as inspiration references.
+              </span>
+            </div>
+          )}
+
           <Field
             label="What would you like?"
             hint="A short sketch of the idea: names, materials, size, mood."

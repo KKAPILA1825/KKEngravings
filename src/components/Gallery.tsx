@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Section } from "./Section";
 import { photos } from "../data/photos";
 import type { Photo, PhotoCategory } from "../types";
 import { Lightbox } from "./Lightbox";
+import { usePicks } from "../lib/gallery-picks";
 
 const ALL = "All" as const;
 type Filter = typeof ALL | PhotoCategory;
@@ -75,7 +77,28 @@ export function Gallery() {
           onClose={() => setLightboxAt(null)}
         />
       )}
+
+      <FloatingRequestPill />
     </Section>
+  );
+}
+
+function FloatingRequestPill() {
+  const picks = usePicks();
+  if (picks.length === 0) return null;
+  const href = `#/orders/custom?refs=${picks.join(",")}`;
+  return (
+    <a
+      href={href}
+      className="fixed z-40 bottom-5 right-5 sm:bottom-7 sm:right-7 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm font-medium shadow-[0_12px_28px_-10px_rgba(107,68,35,0.55)] hover:bg-[var(--color-walnut)] transition-colors"
+      aria-label={`Review request with ${picks.length} ${picks.length === 1 ? "photo" : "photos"}`}
+    >
+      <Sparkles size={16} aria-hidden />
+      <span>
+        Review request · {picks.length} {picks.length === 1 ? "photo" : "photos"}
+      </span>
+      <ArrowRight size={16} aria-hidden />
+    </a>
   );
 }
 

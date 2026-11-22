@@ -10,7 +10,7 @@ export const site = {
   // Leave these empty strings until real values are available.
   // Components render a "coming soon" placeholder for any empty value.
   contact: {
-    email: "kkengravings@gmail.com",
+    email: "kk.engraving.llc@gmail.com",
     whatsapp: "", // full international number, digits only, e.g. "15551234567"
   },
 

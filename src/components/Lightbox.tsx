@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import type { Photo } from "../types";
+import { MAX_PICKS, togglePick, usePicks } from "../lib/gallery-picks";
 
 type Props = {
   photos: readonly Photo[];
@@ -10,12 +11,25 @@ type Props = {
 
 export function Lightbox({ photos, startIndex, onClose }: Props) {
   const [index, setIndex] = useState(startIndex);
+  const [limitHint, setLimitHint] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const picks = usePicks();
 
   const total = photos.length;
   const photo = photos[index];
+  const isPicked = photo ? picks.includes(photo.slug) : false;
+  const atLimit = picks.length >= MAX_PICKS;
+
+  const onToggle = () => {
+    if (!photo) return;
+    const { atLimit: hitLimit } = togglePick(photo.slug);
+    if (hitLimit) {
+      setLimitHint(true);
+      window.setTimeout(() => setLimitHint(false), 2500);
+    }
+  };
 
   const prev = () => setIndex((i) => (i - 1 + total) % total);
   const next = () => setIndex((i) => (i + 1) % total);
@@ -79,19 +93,43 @@ export function Lightbox({ photos, startIndex, onClose }: Props) {
       }}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between gap-4 px-4 sm:px-6 h-14 text-[var(--color-ivory)]">
+      <div className="flex items-center justify-between gap-3 px-4 sm:px-6 h-14 text-[var(--color-ivory)]">
         <p className="text-xs sm:text-sm tabular-nums opacity-75">
           {index + 1} / {total}
         </p>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close lightbox"
-          className="inline-flex items-center justify-center size-10 rounded-full hover:bg-white/10 transition-colors"
-        >
-          <X size={22} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggle}
+            disabled={!isPicked && atLimit}
+            aria-pressed={isPicked}
+            className={`inline-flex items-center gap-1.5 px-3 sm:px-4 h-9 rounded-full text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              isPicked
+                ? "bg-[var(--color-gold)]/90 text-[var(--color-walnut-dark)] hover:bg-[var(--color-gold)]"
+                : "bg-white/10 text-[var(--color-ivory)] hover:bg-white/20"
+            }`}
+          >
+            {isPicked ? <Check size={16} /> : <Plus size={16} />}
+            <span>{isPicked ? "Added — remove" : "Add to request"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close lightbox"
+            className="inline-flex items-center justify-center size-10 rounded-full hover:bg-white/10 transition-colors"
+          >
+            <X size={22} />
+          </button>
+        </div>
       </div>
+      {limitHint && (
+        <div
+          role="status"
+          className="mx-4 sm:mx-6 -mt-2 mb-2 px-3 py-2 rounded-md bg-red-500/20 text-red-100 text-xs"
+        >
+          You can select up to {MAX_PICKS} photos in one request.
+        </div>
+      )}
 
       {/* Stage */}
       <div className="relative flex-1 flex items-center justify-center px-2 sm:px-6 overflow-hidden">

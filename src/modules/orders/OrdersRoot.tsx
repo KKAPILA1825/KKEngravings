@@ -22,6 +22,7 @@ function OrdersRouter({ route }: { route: OrdersRoute }) {
             : route === "home"
               ? "Shop · KK Engravings"
               : "KK Engravings";
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
     return () => {
       document.title = "KK Engravings";
     };
