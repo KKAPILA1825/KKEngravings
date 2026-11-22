@@ -7,7 +7,7 @@ dist-ssr
 *.tsbuildinfo
 
 # generated optimized images (regenerated via `npm run images`)
-public/images
+
 
 # env / local
 .env
