@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Send, ShoppingBag } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, Mail, RefreshCw, Send, ShoppingBag } from "lucide-react";
 import type { CheckoutStep, ShippingAddress } from "../types";
 import { useCart } from "../cart";
 import { CartLineItem } from "../components/CartLineItem";
@@ -114,10 +114,10 @@ export function CheckoutPage() {
     }
   };
 
-  const sendViaMailtoAndFinish = () => {
+  const openMailtoLastResort = () => {
     openOrderMailto(site.contact.email, cart.items, shipping);
     clearCart();
-    setStep("success");
+    setStep("mailto-opened");
   };
 
   return (
@@ -126,10 +126,14 @@ export function CheckoutPage() {
         Checkout
       </p>
       <h1 className="mt-1 mb-6 font-serif text-3xl sm:text-4xl text-[var(--color-walnut-dark)]">
-        {step === "success" ? "Order received" : "Review your order"}
+        {step === "success"
+          ? "Order received"
+          : step === "mailto-opened"
+            ? "Almost there"
+            : "Review your order"}
       </h1>
 
-      {step !== "success" && <Stepper current={step} />}
+      {step !== "success" && step !== "mailto-opened" && <Stepper current={step} />}
 
       {step === "review" && (
         <>
@@ -192,22 +196,36 @@ export function CheckoutPage() {
               role="alert"
               className="mb-6 rounded-2xl bg-red-50 border-2 border-red-300 p-5 sm:p-6 shadow-[var(--shadow-soft)]"
             >
-              <h3 className="font-serif text-lg text-red-900 mb-2">
-                We couldn't deliver your order automatically.
-              </h3>
-              <p className="text-sm text-red-800 mb-4">
-                No worries — click the button below and your email app will open with
-                everything pre-filled. Just press <strong>Send</strong> in your email
-                app to deliver the request to KK Engravings.
-              </p>
-              <button
-                type="button"
-                onClick={sendViaMailtoAndFinish}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-red-700 text-white text-sm font-medium hover:bg-red-800"
-              >
-                <Send size={16} /> Send via email now
-              </button>
-              <p className="mt-3 text-xs text-red-800/80">
+              <div className="flex items-start gap-3 mb-3">
+                <AlertTriangle className="shrink-0 text-red-700" size={22} />
+                <div>
+                  <h3 className="font-serif text-lg text-red-900">
+                    Your order was not sent.
+                  </h3>
+                  <p className="mt-1 text-sm text-red-800">
+                    Something went wrong reaching our server. Your cart is unchanged —
+                    no email has gone out yet. Please try again.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={sendOrder}
+                  disabled={sending}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-red-700 text-white text-sm font-medium hover:bg-red-800 disabled:opacity-60"
+                >
+                  <RefreshCw size={16} /> {sending ? "Trying…" : "Try again"}
+                </button>
+                <button
+                  type="button"
+                  onClick={openMailtoLastResort}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border-2 border-red-700 text-red-800 text-sm font-medium hover:bg-red-100"
+                >
+                  <Mail size={16} /> Email directly instead
+                </button>
+              </div>
+              <p className="mt-3 text-xs text-red-800/70">
                 Technical details: {sendError}
               </p>
             </div>
@@ -274,6 +292,41 @@ export function CheckoutPage() {
           <p className="mt-3 text-[var(--color-charcoal-soft)]">
             Thank you! KK Engravings will contact you shortly at the email address you
             provided with final pricing, timeline, and payment instructions.
+          </p>
+          <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("home")}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm hover:bg-[var(--color-walnut)]"
+            >
+              Continue shopping
+            </button>
+            <button
+              type="button"
+              onClick={() => leaveOrders("#home")}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
+            >
+              Back to home
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === "mailto-opened" && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 sm:p-10 shadow-[var(--shadow-soft)] text-center">
+          <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-amber-200/60">
+            <Mail size={28} className="text-amber-900" />
+          </div>
+          <h2 className="font-serif text-2xl sm:text-3xl text-amber-900">
+            We've opened your email app.
+          </h2>
+          <p className="mt-3 text-amber-900">
+            Your order details are pre-filled in a draft email. <strong>Please press
+            Send</strong> inside your email app to deliver it to KK Engravings.
+          </p>
+          <p className="mt-2 text-sm text-amber-900/80">
+            We can't confirm delivery from here — the request only reaches KK once you
+            press Send in your mail app.
           </p>
           <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
             <button

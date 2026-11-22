@@ -62,4 +62,9 @@ export type ShippingAddress = {
   country: "US";
 };
 
-export type CheckoutStep = "review" | "shipping" | "payment" | "success";
+export type CheckoutStep =
+  | "review"
+  | "shipping"
+  | "payment"
+  | "success"
+  | "mailto-opened";

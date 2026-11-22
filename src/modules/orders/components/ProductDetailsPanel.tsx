@@ -26,14 +26,11 @@ export function ProductDetailsPanel({ design, onViewCart }: Props) {
   const [justAdded, setJustAdded] = useState(false);
   const [adding, setAdding] = useState(false);
 
-  // Reset form when the user switches designs. variants is derived from
-  // design.categoryId (module-level constant arrays), so design.id is the
-  // only identity we need to watch.
+  // When the user switches designs, keep their in-progress engraving text,
+  // occasion, and quantity — those are their work. Only refresh the variant
+  // (which is category-scoped) and clear transient UI state.
   useEffect(() => {
     setVariantId(variants[0]?.id ?? "");
-    setEngraving("");
-    setOccasion("");
-    setQuantity(1);
     setError(null);
     setJustAdded(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +64,10 @@ export function ProductDetailsPanel({ design, onViewCart }: Props) {
       quantity,
     });
     setJustAdded(true);
+    // Clear the form so the next add doesn't inherit the last message
+    setEngraving("");
+    setOccasion("");
+    setQuantity(1);
     setTimeout(() => {
       setAdding(false);
       setJustAdded(false);
@@ -111,9 +112,25 @@ export function ProductDetailsPanel({ design, onViewCart }: Props) {
       </label>
       */}
 
+      <div>
+        <span className="block text-sm font-medium text-[var(--color-walnut-dark)] mb-1.5">
+          Design
+        </span>
+        <div
+          aria-readonly="true"
+          className="w-full rounded-lg bg-[var(--color-ivory-soft)]/70 border border-[color-mix(in_oklab,var(--color-walnut)_20%,transparent)] px-3.5 py-2.5 text-[15px] text-[var(--color-walnut-dark)] font-medium select-all"
+          title="Select and copy this name into your instructions below"
+        >
+          {design.title}
+        </div>
+        <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">
+          Please copy this name into the instructions below, then describe how you'd like it engraved.
+        </span>
+      </div>
+
       <label className="block">
         <span className="flex items-center justify-between text-sm font-medium text-[var(--color-walnut-dark)] mb-1.5">
-          <span>Engraving instructions</span>
+          <span>Your engraving instructions</span>
           <span className="text-xs text-[var(--color-charcoal-soft)]/70">
             {engravingText.length}/{MAX_ENGRAVING}
           </span>
@@ -122,10 +139,13 @@ export function ProductDetailsPanel({ design, onViewCart }: Props) {
           value={engravingText}
           onChange={(e) => setEngraving(e.target.value.slice(0, MAX_ENGRAVING))}
           rows={5}
-          placeholder="e.g. Please engrave our family name and 'Est. 2019' in a cursive font."
+          placeholder={`e.g. ${design.title}\nPlease engrave our family name and "Est. 2019" in a cursive font.`}
           className={`${inputCls} resize-y min-h-[120px]`}
           required
         />
+        <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">
+          Start with the design name (copy from above), then your instructions on the next line.
+        </span>
       </label>
 
       <label className="block">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode, FormEvent } from "react";
-import { Mail } from "lucide-react";
+import { AlertTriangle, Check, Mail, RefreshCw } from "lucide-react";
 import { Section } from "./Section";
 import { site } from "../data/site.config";
 
@@ -20,22 +20,71 @@ function Field({ label, children, hint }: { label: string; children: ReactNode; 
 const inputCls =
   "w-full rounded-lg bg-[var(--color-ivory)] border border-[color-mix(in_oklab,var(--color-walnut)_20%,transparent)] px-3.5 py-2.5 text-[15px] placeholder:text-[var(--color-charcoal-soft)]/50 focus:border-[var(--color-walnut)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)]/50 transition-colors";
 
+type SendState = "idle" | "sending" | "success" | "mailto-opened" | "error";
+
+function buildMailtoHref(name: string, email: string, occasion: string, idea: string): string {
+  const subject = `KK Engravings custom request from ${name || "a new customer"}`;
+  const body = `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "Not specified"}\n\nWhat I'd like:\n${idea}\n\nSent from the KK Engravings website.`;
+  return `mailto:${site.contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export function Custom() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [idea, setIdea] = useState("");
   const [occasion, setOccasion] = useState("");
+  const [state, setState] = useState<SendState>("idle");
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
   const canSend = site.contact.email.trim().length > 0;
 
-  const handleSubmit = (e: FormEvent) => {
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setIdea("");
+    setOccasion("");
+  };
+
+  const submitToNetlify = async (): Promise<void> => {
+    const params = new URLSearchParams();
+    params.set("form-name", "kk-engravings-custom");
+    params.set("bot-field", "");
+    params.set("customer_name", name);
+    params.set("email", email);
+    params.set("occasion", occasion);
+    params.set("idea", idea);
+    const res = await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+    if (!res.ok) throw new Error(`Submission failed (${res.status})`);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!canSend) return;
-    const subject = encodeURIComponent(`KK Engravings custom request from ${name || "a new customer"}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "Not specified"}\n\nWhat I'd like:\n${idea}\n\nSent from the KK Engravings website.`,
-    );
-    window.location.href = `mailto:${site.contact.email}?subject=${subject}&body=${body}`;
+    if (!canSend || state === "sending") return;
+    setState("sending");
+    setErrorDetail(null);
+    try {
+      await submitToNetlify();
+      setState("success");
+      resetForm();
+    } catch (err) {
+      console.warn("[KK Custom] Netlify submission failed:", err);
+      setErrorDetail(err instanceof Error ? err.message : "Could not reach our server.");
+      setState("error");
+    }
+  };
+
+  const openMailtoLastResort = () => {
+    window.location.href = buildMailtoHref(name, email, occasion, idea);
+    setState("mailto-opened");
+  };
+
+  const sendAnother = () => {
+    setState("idle");
+    setErrorDetail(null);
   };
 
   return (
@@ -61,6 +110,50 @@ export function Custom() {
           </ul>
         </div>
 
+        {state === "success" ? (
+          <div className="bg-[var(--color-ivory-soft)] rounded-2xl p-8 shadow-[var(--shadow-soft)] text-center">
+            <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-[var(--color-gold)]/40">
+              <Check size={28} className="text-[var(--color-walnut-dark)]" />
+            </div>
+            <h3 className="font-serif text-2xl text-[var(--color-walnut-dark)]">
+              Thanks — your request is on its way.
+            </h3>
+            <p className="mt-3 text-[var(--color-charcoal-soft)]">
+              KK Engravings will get back to you by email with next steps, timeline, and a quote.
+            </p>
+            <button
+              type="button"
+              onClick={sendAnother}
+              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm hover:bg-[var(--color-walnut)]"
+            >
+              Send another request
+            </button>
+          </div>
+        ) : state === "mailto-opened" ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 shadow-[var(--shadow-soft)] text-center">
+            <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-amber-200/60">
+              <Mail size={28} className="text-amber-900" />
+            </div>
+            <h3 className="font-serif text-2xl text-amber-900">
+              We've opened your email app.
+            </h3>
+            <p className="mt-3 text-amber-900">
+              Your details are pre-filled in a draft email. <strong>Please press Send</strong> inside
+              your email app to deliver it to KK Engravings.
+            </p>
+            <p className="mt-2 text-sm text-amber-900/80">
+              We can't confirm delivery from here — the request only reaches KK once you press
+              Send in your mail app.
+            </p>
+            <button
+              type="button"
+              onClick={sendAnother}
+              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
+            >
+              Send another request
+            </button>
+          </div>
+        ) : (
         <form
           onSubmit={handleSubmit}
           className="bg-[var(--color-ivory-soft)] rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-soft)] space-y-4"
@@ -107,16 +200,43 @@ export function Custom() {
             />
           </Field>
 
+          {state === "error" && (
+            <div
+              role="alert"
+              className="rounded-xl bg-red-50 border-2 border-red-300 p-4 space-y-3"
+            >
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="shrink-0 text-red-700" size={20} />
+                <div className="text-sm text-red-800">
+                  <p className="font-medium text-red-900">Your request was not sent.</p>
+                  <p className="mt-1">
+                    Something went wrong reaching our server — no email has gone out yet.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-700 text-white text-sm font-medium hover:bg-red-800"
+                >
+                  <RefreshCw size={14} /> Try again
+                </button>
+                <button
+                  type="button"
+                  onClick={openMailtoLastResort}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border-2 border-red-700 text-red-800 text-sm font-medium hover:bg-red-100"
+                >
+                  <Mail size={14} /> Email directly instead
+                </button>
+              </div>
+              {errorDetail && (
+                <p className="text-xs text-red-800/70">Technical details: {errorDetail}</p>
+              )}
+            </div>
+          )}
+
           <div className="pt-2">
-            {canSend ? (
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 bg-[var(--color-walnut)] hover:bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] px-6 py-3 rounded-full text-sm font-medium tracking-wide transition-colors shadow-[0_8px_24px_-12px_rgba(107,68,35,0.5)]"
-              >
-                <Mail size={16} />
-                Send request
-              </button>
-            ) : (
+            {!canSend ? (
               <div>
                 <button
                   type="button"
@@ -131,13 +251,23 @@ export function Custom() {
                   Contact details coming soon. Check back shortly.
                 </p>
               </div>
-            )}
+            ) : state !== "error" ? (
+              <button
+                type="submit"
+                disabled={state === "sending"}
+                className="inline-flex items-center gap-2 bg-[var(--color-walnut)] hover:bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] px-6 py-3 rounded-full text-sm font-medium tracking-wide transition-colors shadow-[0_8px_24px_-12px_rgba(107,68,35,0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <Mail size={16} />
+                {state === "sending" ? "Sending…" : "Send request"}
+              </button>
+            ) : null}
           </div>
 
           <p className="text-[11px] text-[var(--color-charcoal-soft)]/70 leading-relaxed pt-2">
-            Submitting opens your email client with the details pre-filled. Nothing is sent from this site directly.
+            Your request is delivered directly to KK Engravings. We'll get back to you by email.
           </p>
         </form>
+        )}
       </div>
     </Section>
   );
