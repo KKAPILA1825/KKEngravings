@@ -11,5 +11,24 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      Netlify Forms detector template. Netlify scans deployed HTML at build time
+      for forms with `netlify` attribute and registers them by name. Real
+      submissions are sent from the React checkout via fetch("/", form-encoded,
+      form-name=kk-engravings-order). This block is never rendered.
+    -->
+    <form name="kk-engravings-order" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="bot-field" />
+      <input type="text" name="customer_name" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <input type="text" name="address_line1" />
+      <input type="text" name="address_line2" />
+      <input type="text" name="city" />
+      <input type="text" name="state" />
+      <input type="text" name="zip" />
+      <textarea name="order_details"></textarea>
+    </form>
   </body>
 </html>

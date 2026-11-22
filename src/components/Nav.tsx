@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingBag } from "lucide-react";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import { site } from "../data/site.config";
 
@@ -11,10 +11,23 @@ const LINKS = [
   { id: "contact", label: "Contact" },
 ] as const;
 
+function useOrdersActive() {
+  const [active, setActive] = useState<boolean>(
+    typeof window !== "undefined" && window.location.hash.startsWith("#/orders"),
+  );
+  useEffect(() => {
+    const onChange = () => setActive(window.location.hash.startsWith("#/orders"));
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
+  }, []);
+  return active;
+}
+
 export function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const active = useScrollSpy(LINKS.map((l) => l.id), 120);
+  const ordersActive = useOrdersActive();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -50,7 +63,7 @@ export function Nav() {
 
           <ul className="hidden md:flex items-center gap-1">
             {LINKS.map((l) => {
-              const isActive = active === l.id;
+              const isActive = !ordersActive && active === l.id;
               return (
                 <li key={l.id}>
                   <a
@@ -73,6 +86,26 @@ export function Nav() {
                 </li>
               );
             })}
+            <li>
+              <a
+                href="#/orders"
+                aria-current={ordersActive ? "page" : undefined}
+                className={`relative inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors ${
+                  ordersActive
+                    ? "text-[var(--color-walnut-dark)]"
+                    : "text-[var(--color-charcoal-soft)] hover:text-[var(--color-walnut-dark)]"
+                }`}
+              >
+                <ShoppingBag size={15} aria-hidden />
+                Shop
+                <span
+                  aria-hidden
+                  className={`absolute left-3 right-3 -bottom-0.5 h-px bg-[var(--color-gold)] transition-opacity duration-300 ${
+                    ordersActive ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              </a>
+            </li>
           </ul>
 
           <button
@@ -93,7 +126,7 @@ export function Nav() {
             className="md:hidden pb-4 pt-1 flex flex-col gap-1 border-t border-[color-mix(in_oklab,var(--color-walnut)_18%,transparent)]"
           >
             {LINKS.map((l) => {
-              const isActive = active === l.id;
+              const isActive = !ordersActive && active === l.id;
               return (
                 <li key={l.id}>
                   <a
@@ -111,6 +144,20 @@ export function Nav() {
                 </li>
               );
             })}
+            <li>
+              <a
+                href="#/orders"
+                onClick={() => setOpen(false)}
+                aria-current={ordersActive ? "page" : undefined}
+                className={`flex items-center gap-2 px-3 py-3 text-base rounded-md ${
+                  ordersActive
+                    ? "text-[var(--color-walnut-dark)] bg-[var(--color-ivory-deep)]"
+                    : "text-[var(--color-charcoal-soft)]"
+                }`}
+              >
+                <ShoppingBag size={16} aria-hidden /> Shop
+              </a>
+            </li>
           </ul>
         )}
       </nav>

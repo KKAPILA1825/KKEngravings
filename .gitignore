@@ -8,6 +8,8 @@ dist-ssr
 
 # generated optimized images (regenerated via `npm run images`)
 
+# large originals (optimized derivatives under public/orders-images are tracked)
+/KK engravings website order page pics/
 
 # env / local
 .env

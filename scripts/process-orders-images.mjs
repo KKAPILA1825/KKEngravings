@@ -1,0 +1,233 @@
+// Reads "KK engravings website order page pics/", outputs WebP thumbs (600w) + full (1600w)
+// to public/orders-images/. Also writes src/modules/orders/data/designs.generated.ts
+// (category + title inferred from filename). Idempotent.
+
+import { readdir, mkdir, readFile, writeFile, stat } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import sharp from "sharp";
+import heicConvert from "heic-convert";
+
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\//, "")), "..");
+const SRC = path.join(ROOT, "KK engravings website order page pics");
+const OUT = path.join(ROOT, "public", "orders-images");
+const META = path.join(OUT, "manifest.json");
+const TS_OUT = path.join(ROOT, "src", "modules", "orders", "data", "designs.generated.ts");
+
+const SIZES = { thumb: 600, full: 1600 };
+const SUPPORTED = new Set([".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"]);
+const SKIP_EXT = new Set([".cr3", ".cr2", ".nef", ".arw", ".raf", ".dng"]);
+
+// Category detection — filename prefix → canonical category id/label.
+// Order matters: more specific patterns first.
+const CATEGORY_RULES = [
+  { test: /^babay\s*plaque|^baby\s*plaque/i, id: "baby-plaques", label: "Baby Plaques" },
+  { test: /^family\s*plau?e|^family\s*plaque/i, id: "family-plaques", label: "Family Plaques" },
+  { test: /^name\s*plaque/i, id: "name-plaques", label: "Name Plaques" },
+  { test: /^pet\s*ornaments?/i, id: "pet-ornaments", label: "Pet Ornaments" },
+  { test: /^ornament/i, id: "ornaments", label: "Ornaments" },
+  { test: /^coaster/i, id: "coasters", label: "Coasters" },
+  { test: /^keychain/i, id: "keychains", label: "Keychains" },
+  { test: /^(gift\s*c(?:ard|rd)\s*holder)/i, id: "gift-card-holders", label: "Gift Card Holders" },
+  { test: /^luggage/i, id: "luggage-tags", label: "Luggage Tags" },
+  { test: /^wall/i, id: "wall-art", label: "Wall Art" },
+];
+
+function slugify(name) {
+  const base = name.replace(/\.[^.]+$/, "");
+  return base
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+function categorize(file) {
+  for (const rule of CATEGORY_RULES) {
+    if (rule.test.test(file)) return { id: rule.id, label: rule.label };
+  }
+  return { id: "uncategorized", label: "Uncategorized" };
+}
+
+// Build a human-friendly display title from the filename.
+// Fixes common typos ("Babay"→"Baby", "Deisgn"→"Design", "Crd"→"Card", "Plaue"→"Plaque").
+// Extracts "#N" suffix for ordering.
+function titleAndIndex(file, categoryLabel) {
+  const base = file.replace(/\.[^.]+$/, "");
+  const idxMatch = base.match(/#\s*(\d+)/);
+  const designIndex = idxMatch ? parseInt(idxMatch[1], 10) : 0;
+  let cleaned = base
+    .replace(/\s*#\s*\d+/g, "")
+    .replace(/\s*\bdesign\b\s*/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  cleaned = cleaned
+    .replace(/babay/gi, "Baby")
+    .replace(/plaue/gi, "Plaque")
+    .replace(/\bcrd\b/gi, "Card")
+    .replace(/deisgn|desiggn|deisggn/gi, "Design");
+  if (!cleaned || cleaned.toLowerCase() === categoryLabel.toLowerCase().replace(/s$/, "")) {
+    return {
+      title: `${categoryLabel.replace(/s$/, "")} Design ${designIndex || ""}`.trim(),
+      designIndex,
+    };
+  }
+  const titled = cleaned
+    .split(" ")
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w))
+    .join(" ");
+  const suffix = designIndex ? ` · Design #${designIndex}` : "";
+  return { title: `${titled}${suffix}`, designIndex };
+}
+
+async function loadAsSharp(absPath, ext) {
+  if (ext === ".heic" || ext === ".heif") {
+    const buf = await readFile(absPath);
+    const jpeg = await heicConvert({ buffer: buf, format: "JPEG", quality: 0.95 });
+    return sharp(Buffer.from(jpeg));
+  }
+  return sharp(absPath, { failOnError: false });
+}
+
+async function processOne(file) {
+  const ext = path.extname(file).toLowerCase();
+  if (SKIP_EXT.has(ext)) {
+    console.warn(`  skip (raw, unsupported): ${file}`);
+    return null;
+  }
+  if (!SUPPORTED.has(ext)) {
+    console.warn(`  skip (unknown ext): ${file}`);
+    return null;
+  }
+  const slug = slugify(file);
+  const absPath = path.join(SRC, file);
+  const outThumb = path.join(OUT, `${slug}.thumb.webp`);
+  const outFull = path.join(OUT, `${slug}.webp`);
+
+  let img = await loadAsSharp(absPath, ext);
+  img = img.rotate();
+
+  const fullMeta = await img
+    .clone()
+    .resize({ width: SIZES.full, withoutEnlargement: true })
+    .webp({ quality: 82, effort: 5 })
+    .toFile(outFull);
+
+  await img
+    .clone()
+    .resize({ width: SIZES.thumb, withoutEnlargement: true })
+    .webp({ quality: 78, effort: 5 })
+    .toFile(outThumb);
+
+  return {
+    source: file,
+    slug,
+    thumb: `/orders-images/${slug}.thumb.webp`,
+    full: `/orders-images/${slug}.webp`,
+    width: fullMeta.width,
+    height: fullMeta.height,
+  };
+}
+
+function toTs(designs) {
+  const header =
+    "// GENERATED by scripts/process-orders-images.mjs. Do not edit by hand.\n" +
+    "// Re-run after adding images:   npm run images:orders\n" +
+    'import type { Design } from "../types";\n\n' +
+    "export const designs: readonly Design[] = ";
+  return header + JSON.stringify(designs, null, 2) + " as const;\n";
+}
+
+async function main() {
+  const srcStat = await stat(SRC).catch(() => null);
+  if (!srcStat) {
+    console.error(`Source folder not found: ${SRC}`);
+    process.exit(1);
+  }
+  await mkdir(OUT, { recursive: true });
+  await mkdir(path.dirname(TS_OUT), { recursive: true });
+
+  const files = (await readdir(SRC)).filter((f) => !f.startsWith("."));
+  console.log(`Processing ${files.length} file(s) from ${SRC}`);
+  console.log(`Output: ${OUT}\n`);
+
+  const manifest = [];
+  const designs = [];
+  let skipped = 0;
+
+  for (const f of files) {
+    const ext = path.extname(f).toLowerCase();
+    if (SKIP_EXT.has(ext)) {
+      console.warn(`  skip (raw): ${f}`);
+      skipped += 1;
+      continue;
+    }
+    if (!SUPPORTED.has(ext)) {
+      console.warn(`  skip (ext): ${f}`);
+      skipped += 1;
+      continue;
+    }
+
+    const outFull = path.join(OUT, `${slugify(f)}.webp`);
+    let entry;
+    if (existsSync(outFull)) {
+      const meta = await sharp(outFull).metadata();
+      const slug = slugify(f);
+      entry = {
+        source: f,
+        slug,
+        thumb: `/orders-images/${slug}.thumb.webp`,
+        full: `/orders-images/${slug}.webp`,
+        width: meta.width ?? 0,
+        height: meta.height ?? 0,
+      };
+      console.log(`  cached: ${f}`);
+    } else {
+      try {
+        entry = await processOne(f);
+        if (!entry) {
+          skipped += 1;
+          continue;
+        }
+        console.log(`  ok:     ${f}  ->  ${entry.slug}.webp  (${entry.width}x${entry.height})`);
+      } catch (err) {
+        skipped += 1;
+        console.error(`  ERROR:  ${f}  — ${err?.message ?? err}`);
+        continue;
+      }
+    }
+
+    manifest.push(entry);
+    const cat = categorize(f);
+    const ti = titleAndIndex(f, cat.label);
+    designs.push({
+      id: entry.slug,
+      categoryId: cat.id,
+      categoryLabel: cat.label,
+      title: ti.title,
+      designIndex: ti.designIndex,
+      imageFull: entry.full,
+      imageThumb: entry.thumb,
+      width: entry.width,
+      height: entry.height,
+      alt: `${cat.label} — ${ti.title}`,
+    });
+  }
+
+  designs.sort((a, b) => {
+    if (a.categoryId !== b.categoryId) return a.categoryId.localeCompare(b.categoryId);
+    if (a.designIndex !== b.designIndex) return a.designIndex - b.designIndex;
+    return a.id.localeCompare(b.id);
+  });
+
+  await writeFile(META, JSON.stringify(manifest, null, 2));
+  await writeFile(TS_OUT, toTs(designs));
+  console.log(`\nDone. ${designs.length} designs, ${skipped} skipped.`);
+  console.log(`Manifest: ${META}`);
+  console.log(`Designs:  ${TS_OUT}`);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

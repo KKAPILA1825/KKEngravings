@@ -6,6 +6,7 @@ import { Custom } from "./components/Custom";
 import { Contact } from "./components/Contact";
 import { Footer } from "./components/Footer";
 import { BackToTop } from "./components/BackToTop";
+import { OrdersRoot } from "./modules/orders/OrdersRoot";
 
 export default function App() {
   return (
@@ -17,13 +18,17 @@ export default function App() {
         Skip to content
       </a>
       <Nav />
-      <main>
-        <Hero />
-        <About />
-        <Gallery />
-        <Custom />
-        <Contact />
-      </main>
+      <OrdersRoot
+        fallback={
+          <main>
+            <Hero />
+            <About />
+            <Gallery />
+            <Custom />
+            <Contact />
+          </main>
+        }
+      />
       <Footer />
       <BackToTop />
     </>
