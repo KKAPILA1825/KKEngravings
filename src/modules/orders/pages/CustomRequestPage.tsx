@@ -1,18 +1,27 @@
 import { useState } from "react";
 import type { ReactNode, FormEvent } from "react";
-import { AlertTriangle, Check, Mail, RefreshCw } from "lucide-react";
-import { Section } from "./Section";
-import { site } from "../data/site.config";
+import { AlertTriangle, ArrowLeft, Check, Mail, RefreshCw } from "lucide-react";
+import { site } from "../../../data/site.config";
+import { navigate, leaveOrders } from "../router";
 
-// NOTE: Field is defined at module scope on purpose. Defining it inside
-// the Custom function would re-create the component on every render, causing
-// React to unmount/remount the <input>s inside and lose focus after each keystroke.
-function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+function Field({
+  label,
+  children,
+  hint,
+}: {
+  label: string;
+  children: ReactNode;
+  hint?: string;
+}) {
   return (
     <label className="block">
-      <span className="block text-sm font-medium text-[var(--color-walnut-dark)] mb-1.5">{label}</span>
+      <span className="block text-sm font-medium text-[var(--color-walnut-dark)] mb-1.5">
+        {label}
+      </span>
       {children}
-      {hint && <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">{hint}</span>}
+      {hint && (
+        <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">{hint}</span>
+      )}
     </label>
   );
 }
@@ -22,13 +31,18 @@ const inputCls =
 
 type SendState = "idle" | "sending" | "success" | "mailto-opened" | "error";
 
-function buildMailtoHref(name: string, email: string, occasion: string, idea: string): string {
+function buildMailtoHref(
+  name: string,
+  email: string,
+  occasion: string,
+  idea: string,
+): string {
   const subject = `KK Engravings custom request from ${name || "a new customer"}`;
   const body = `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "Not specified"}\n\nWhat I'd like:\n${idea}\n\nSent from the KK Engravings website.`;
   return `mailto:${site.contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-export function Custom() {
+export function CustomRequestPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [idea, setIdea] = useState("");
@@ -88,75 +102,99 @@ export function Custom() {
   };
 
   return (
-    <Section id="custom" eyebrow="Custom Requests" title="Have an idea? Let’s make it." tone="ivory-deep">
-      <div className="grid md:grid-cols-[1fr_1.1fr] gap-10 lg:gap-14 items-start">
-        <div className="max-w-md space-y-5 text-[var(--color-charcoal-soft)]">
-          <p className="text-[1.05rem] leading-relaxed">
-            From monogrammed coasters to personalized name puzzles, tell me about the piece you’re imagining and I’ll be in touch with next steps, timelines, and a quote.
-          </p>
-          <ul className="space-y-2.5 text-sm">
-            <li className="flex items-start gap-2">
-              <span className="mt-2 size-1 rounded-full bg-[var(--color-walnut)]" />
-              <span>Great for birthdays, weddings, housewarming, and holiday gifts.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-2 size-1 rounded-full bg-[var(--color-walnut)]" />
-              <span>Materials vary by design: wood, slate, acrylic, and leather.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-2 size-1 rounded-full bg-[var(--color-walnut)]" />
-              <span>Each request is reviewed personally before anything is confirmed.</span>
-            </li>
-          </ul>
-        </div>
+    <div className="mx-auto max-w-4xl px-5 sm:px-8 pt-24 sm:pt-28 pb-16">
+      <div className="mb-6">
+        <button
+          type="button"
+          onClick={() => navigate("home")}
+          className="inline-flex items-center gap-2 text-sm text-[var(--color-walnut-dark)] hover:text-[var(--color-walnut)]"
+        >
+          <ArrowLeft size={16} /> Back to shop
+        </button>
+      </div>
 
-        {state === "success" ? (
-          <div className="bg-[var(--color-ivory-soft)] rounded-2xl p-8 shadow-[var(--shadow-soft)] text-center">
-            <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-[var(--color-gold)]/40">
-              <Check size={28} className="text-[var(--color-walnut-dark)]" />
-            </div>
-            <h3 className="font-serif text-2xl text-[var(--color-walnut-dark)]">
-              Thanks — your request is on its way.
-            </h3>
-            <p className="mt-3 text-[var(--color-charcoal-soft)]">
-              KK Engravings will get back to you by email with next steps, timeline, and a quote.
-            </p>
+      <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-walnut)]/80">
+        Shop · Custom Requests
+      </p>
+      <h1 className="mt-1 font-serif text-3xl sm:text-4xl text-[var(--color-walnut-dark)]">
+        Can't find what you want? Tell me about it.
+      </h1>
+      <p className="mt-3 max-w-2xl text-[var(--color-charcoal-soft)]">
+        From monogrammed coasters to personalized name puzzles — describe the piece you're
+        imagining and KK will be in touch with next steps, timeline, and a quote.
+      </p>
+
+      {state === "success" ? (
+        <div className="mt-8 bg-[var(--color-ivory-soft)] rounded-2xl p-8 shadow-[var(--shadow-soft)] text-center">
+          <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-[var(--color-gold)]/40">
+            <Check size={28} className="text-[var(--color-walnut-dark)]" />
+          </div>
+          <h2 className="font-serif text-2xl text-[var(--color-walnut-dark)]">
+            Thanks — your request is on its way.
+          </h2>
+          <p className="mt-3 text-[var(--color-charcoal-soft)]">
+            KK Engravings will get back to you by email with next steps, timeline, and a quote.
+          </p>
+          <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("home")}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm hover:bg-[var(--color-walnut)]"
+            >
+              Continue shopping
+            </button>
             <button
               type="button"
               onClick={sendAnother}
-              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm hover:bg-[var(--color-walnut)]"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
+            >
+              Send another request
+            </button>
+            <button
+              type="button"
+              onClick={() => leaveOrders("#home")}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
+            >
+              Back to home
+            </button>
+          </div>
+        </div>
+      ) : state === "mailto-opened" ? (
+        <div className="mt-8 bg-amber-50 border border-amber-200 rounded-2xl p-8 shadow-[var(--shadow-soft)] text-center">
+          <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-amber-200/60">
+            <Mail size={28} className="text-amber-900" />
+          </div>
+          <h2 className="font-serif text-2xl text-amber-900">We've opened your email app.</h2>
+          <p className="mt-3 text-amber-900">
+            Your details are pre-filled in a draft email.{" "}
+            <strong>Please press Send</strong> inside your email app to deliver it to KK
+            Engravings.
+          </p>
+          <p className="mt-2 text-sm text-amber-900/80">
+            We can't confirm delivery from here — the request only reaches KK once you press
+            Send in your mail app.
+          </p>
+          <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("home")}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm hover:bg-[var(--color-walnut)]"
+            >
+              Continue shopping
+            </button>
+            <button
+              type="button"
+              onClick={sendAnother}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
             >
               Send another request
             </button>
           </div>
-        ) : state === "mailto-opened" ? (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 shadow-[var(--shadow-soft)] text-center">
-            <div className="mx-auto mb-4 grid place-items-center size-14 rounded-full bg-amber-200/60">
-              <Mail size={28} className="text-amber-900" />
-            </div>
-            <h3 className="font-serif text-2xl text-amber-900">
-              We've opened your email app.
-            </h3>
-            <p className="mt-3 text-amber-900">
-              Your details are pre-filled in a draft email. <strong>Please press Send</strong> inside
-              your email app to deliver it to KK Engravings.
-            </p>
-            <p className="mt-2 text-sm text-amber-900/80">
-              We can't confirm delivery from here — the request only reaches KK once you press
-              Send in your mail app.
-            </p>
-            <button
-              type="button"
-              onClick={sendAnother}
-              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
-            >
-              Send another request
-            </button>
-          </div>
-        ) : (
+        </div>
+      ) : (
         <form
           onSubmit={handleSubmit}
-          className="bg-[var(--color-ivory-soft)] rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-soft)] space-y-4"
+          className="mt-8 bg-[var(--color-ivory-soft)] rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-soft)] space-y-4"
           noValidate
         >
           <div className="grid sm:grid-cols-2 gap-4">
@@ -181,12 +219,15 @@ export function Custom() {
               />
             </Field>
           </div>
-          <Field label="What would you like?" hint="A short sketch of the idea: names, materials, size, mood.">
+          <Field
+            label="What would you like?"
+            hint="A short sketch of the idea: names, materials, size, mood."
+          >
             <textarea
               required
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
-              rows={5}
+              rows={6}
               className={`${inputCls} resize-y min-h-28`}
             />
           </Field>
@@ -244,31 +285,31 @@ export function Custom() {
                   aria-disabled="true"
                   className="inline-flex items-center gap-2 bg-[color-mix(in_oklab,var(--color-walnut)_25%,transparent)] text-[var(--color-ivory)] px-6 py-3 rounded-full text-sm font-medium tracking-wide cursor-not-allowed"
                 >
-                  <Mail size={16} />
-                  Send request
+                  <Mail size={16} /> Send request
                 </button>
                 <p className="mt-3 text-xs text-[var(--color-charcoal-soft)] italic">
                   Contact details coming soon. Check back shortly.
                 </p>
               </div>
-            ) : state !== "error" ? (
-              <button
-                type="submit"
-                disabled={state === "sending"}
-                className="inline-flex items-center gap-2 bg-[var(--color-walnut)] hover:bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] px-6 py-3 rounded-full text-sm font-medium tracking-wide transition-colors shadow-[0_8px_24px_-12px_rgba(107,68,35,0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <Mail size={16} />
-                {state === "sending" ? "Sending…" : "Send request"}
-              </button>
-            ) : null}
+            ) : (
+              state !== "error" && (
+                <button
+                  type="submit"
+                  disabled={state === "sending"}
+                  className="inline-flex items-center gap-2 bg-[var(--color-walnut)] hover:bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] px-6 py-3 rounded-full text-sm font-medium tracking-wide transition-colors shadow-[0_8px_24px_-12px_rgba(107,68,35,0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <Mail size={16} />
+                  {state === "sending" ? "Sending…" : "Send request"}
+                </button>
+              )
+            )}
           </div>
 
           <p className="text-[11px] text-[var(--color-charcoal-soft)]/70 leading-relaxed pt-2">
             Your request is delivered directly to KK Engravings. We'll get back to you by email.
           </p>
         </form>
-        )}
-      </div>
-    </Section>
+      )}
+    </div>
   );
 }

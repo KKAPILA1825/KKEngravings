@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type OrdersRoute = "none" | "home" | "cart" | "checkout";
+export type OrdersRoute = "none" | "home" | "cart" | "checkout" | "custom";
 
 const PREFIX = "#/orders";
 
@@ -10,6 +10,7 @@ export function parseRoute(hash: string): OrdersRoute {
   if (rest === "" || rest === "/") return "home";
   if (rest === "/cart") return "cart";
   if (rest === "/checkout") return "checkout";
+  if (rest === "/custom") return "custom";
   return "home";
 }
 
@@ -24,6 +25,7 @@ export function navigate(route: OrdersRoute, params?: Record<string, string>): v
   let path = "#/orders";
   if (route === "cart") path = "#/orders/cart";
   else if (route === "checkout") path = "#/orders/checkout";
+  else if (route === "custom") path = "#/orders/custom";
   if (params && Object.keys(params).length > 0) {
     const sp = new URLSearchParams(params);
     path += `?${sp.toString()}`;

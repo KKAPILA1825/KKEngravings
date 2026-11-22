@@ -2,7 +2,6 @@ import { Nav } from "./components/Nav";
 import { Hero } from "./components/Hero";
 import { About } from "./components/About";
 import { Gallery } from "./components/Gallery";
-import { Custom } from "./components/Custom";
 import { Contact } from "./components/Contact";
 import { Footer } from "./components/Footer";
 import { BackToTop } from "./components/BackToTop";
@@ -24,7 +23,6 @@ export default function App() {
             <Hero />
             <About />
             <Gallery />
-            <Custom />
             <Contact />
           </main>
         }

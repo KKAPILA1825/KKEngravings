@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Sparkles, ArrowRight } from "lucide-react";
 import { designs } from "../data/designs.generated";
 import { categories, categoryById } from "../data/categories";
 import type { CategoryId, Design } from "../types";
@@ -85,6 +85,29 @@ export function OrdersPage() {
           )}
         </button>
       </div>
+
+      <button
+        type="button"
+        onClick={() => navigate("custom")}
+        className="group mb-6 w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl border border-[color-mix(in_oklab,var(--color-gold)_40%,transparent)] bg-[color-mix(in_oklab,var(--color-gold)_12%,var(--color-ivory))] hover:bg-[color-mix(in_oklab,var(--color-gold)_20%,var(--color-ivory))] text-left transition-colors"
+      >
+        <span className="flex items-center gap-3">
+          <Sparkles className="shrink-0 text-[var(--color-walnut-dark)]" size={20} aria-hidden />
+          <span>
+            <span className="block text-sm font-medium text-[var(--color-walnut-dark)]">
+              Can't find what you want?
+            </span>
+            <span className="block text-xs text-[var(--color-charcoal-soft)]">
+              Request a custom piece — any design, any occasion.
+            </span>
+          </span>
+        </span>
+        <ArrowRight
+          className="shrink-0 text-[var(--color-walnut-dark)] transition-transform group-hover:translate-x-0.5"
+          size={18}
+          aria-hidden
+        />
+      </button>
 
       <CategoryBar active={category} counts={COUNTS} onPick={(id) => setCategory(id)} />
 

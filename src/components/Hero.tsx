@@ -1,4 +1,4 @@
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ShoppingBag } from "lucide-react";
 import { site } from "../data/site.config";
 import { photos } from "../data/photos";
 
@@ -51,10 +51,11 @@ export function Hero() {
               <ArrowDown size={16} className="transition-transform duration-300 group-hover:translate-y-0.5" />
             </a>
             <a
-              href="#custom"
+              href="#/orders"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium tracking-wide text-[var(--color-walnut-dark)] border border-[color-mix(in_oklab,var(--color-walnut)_30%,transparent)] hover:border-[var(--color-walnut)] hover:bg-[var(--color-ivory-deep)] transition-colors"
             >
-              Request a Custom Piece
+              <ShoppingBag size={16} />
+              Shop
             </a>
           </div>
 

@@ -4,6 +4,7 @@ import { useHashRoute, type OrdersRoute } from "./router";
 import { OrdersPage } from "./pages/OrdersPage";
 import { CartPage } from "./pages/CartPage";
 import { CheckoutPage } from "./pages/CheckoutPage";
+import { CustomRequestPage } from "./pages/CustomRequestPage";
 
 type Props = {
   fallback: React.ReactNode;
@@ -16,9 +17,11 @@ function OrdersRouter({ route }: { route: OrdersRoute }) {
         ? "Cart · KK Engravings"
         : route === "checkout"
           ? "Checkout · KK Engravings"
-          : route === "home"
-            ? "Shop · KK Engravings"
-            : "KK Engravings";
+          : route === "custom"
+            ? "Custom request · KK Engravings"
+            : route === "home"
+              ? "Shop · KK Engravings"
+              : "KK Engravings";
     return () => {
       document.title = "KK Engravings";
     };
@@ -26,12 +29,20 @@ function OrdersRouter({ route }: { route: OrdersRoute }) {
 
   if (route === "cart") return <CartPage />;
   if (route === "checkout") return <CheckoutPage />;
+  if (route === "custom") return <CustomRequestPage />;
   return <OrdersPage />;
 }
 
 export function OrdersRoot({ fallback }: Props) {
   const { route, hash } = useHashRoute();
   const inOrders = route !== "none";
+
+  // Redirect legacy #custom anchor (section no longer exists) to the new route.
+  useEffect(() => {
+    if (hash === "#custom") {
+      window.location.replace("#/orders/custom");
+    }
+  }, [hash]);
 
   // When leaving Orders for a #anchor section, the browser's native
   // scroll-to-anchor fires before the fallback <main> remounts, so the

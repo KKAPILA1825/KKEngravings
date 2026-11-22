@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { useScrollSpy } from "../hooks/useScrollSpy";
 import { site } from "../data/site.config";
@@ -7,9 +7,11 @@ const LINKS = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
   { id: "gallery", label: "Gallery" },
-  { id: "custom", label: "Custom" },
   { id: "contact", label: "Contact" },
 ] as const;
+
+// Final nav order is: Home · Shop · About · Gallery · Contact.
+// Shop is injected after the first link so it sits 2nd.
 
 function useOrdersActive() {
   const [active, setActive] = useState<boolean>(
@@ -62,50 +64,54 @@ export function Nav() {
           </a>
 
           <ul className="hidden md:flex items-center gap-1">
-            {LINKS.map((l) => {
+            {LINKS.map((l, idx) => {
               const isActive = !ordersActive && active === l.id;
               return (
-                <li key={l.id}>
-                  <a
-                    href={`#${l.id}`}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`relative px-3 py-2 text-sm rounded-md transition-colors ${
-                      isActive
-                        ? "text-[var(--color-walnut-dark)]"
-                        : "text-[var(--color-charcoal-soft)] hover:text-[var(--color-walnut-dark)]"
-                    }`}
-                  >
-                    {l.label}
-                    <span
-                      aria-hidden
-                      className={`absolute left-3 right-3 -bottom-0.5 h-px bg-[var(--color-gold)] transition-opacity duration-300 ${
-                        isActive ? "opacity-100" : "opacity-0"
+                <Fragment key={l.id}>
+                  <li>
+                    <a
+                      href={`#${l.id}`}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`relative px-3 py-2 text-sm rounded-md transition-colors ${
+                        isActive
+                          ? "text-[var(--color-walnut-dark)]"
+                          : "text-[var(--color-charcoal-soft)] hover:text-[var(--color-walnut-dark)]"
                       }`}
-                    />
-                  </a>
-                </li>
+                    >
+                      {l.label}
+                      <span
+                        aria-hidden
+                        className={`absolute left-3 right-3 -bottom-0.5 h-px bg-[var(--color-gold)] transition-opacity duration-300 ${
+                          isActive ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                    </a>
+                  </li>
+                  {idx === 0 && (
+                    <li>
+                      <a
+                        href="#/orders"
+                        aria-current={ordersActive ? "page" : undefined}
+                        className={`relative inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors ${
+                          ordersActive
+                            ? "text-[var(--color-walnut-dark)]"
+                            : "text-[var(--color-charcoal-soft)] hover:text-[var(--color-walnut-dark)]"
+                        }`}
+                      >
+                        <ShoppingBag size={15} aria-hidden />
+                        Shop
+                        <span
+                          aria-hidden
+                          className={`absolute left-3 right-3 -bottom-0.5 h-px bg-[var(--color-gold)] transition-opacity duration-300 ${
+                            ordersActive ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </a>
+                    </li>
+                  )}
+                </Fragment>
               );
             })}
-            <li>
-              <a
-                href="#/orders"
-                aria-current={ordersActive ? "page" : undefined}
-                className={`relative inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors ${
-                  ordersActive
-                    ? "text-[var(--color-walnut-dark)]"
-                    : "text-[var(--color-charcoal-soft)] hover:text-[var(--color-walnut-dark)]"
-                }`}
-              >
-                <ShoppingBag size={15} aria-hidden />
-                Shop
-                <span
-                  aria-hidden
-                  className={`absolute left-3 right-3 -bottom-0.5 h-px bg-[var(--color-gold)] transition-opacity duration-300 ${
-                    ordersActive ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-              </a>
-            </li>
           </ul>
 
           <button
@@ -125,39 +131,43 @@ export function Nav() {
             id="mobile-menu"
             className="md:hidden pb-4 pt-1 flex flex-col gap-1 border-t border-[color-mix(in_oklab,var(--color-walnut)_18%,transparent)]"
           >
-            {LINKS.map((l) => {
+            {LINKS.map((l, idx) => {
               const isActive = !ordersActive && active === l.id;
               return (
-                <li key={l.id}>
-                  <a
-                    href={`#${l.id}`}
-                    onClick={() => setOpen(false)}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`block px-3 py-3 text-base rounded-md ${
-                      isActive
-                        ? "text-[var(--color-walnut-dark)] bg-[var(--color-ivory-deep)]"
-                        : "text-[var(--color-charcoal-soft)]"
-                    }`}
-                  >
-                    {l.label}
-                  </a>
-                </li>
+                <Fragment key={l.id}>
+                  <li>
+                    <a
+                      href={`#${l.id}`}
+                      onClick={() => setOpen(false)}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`block px-3 py-3 text-base rounded-md ${
+                        isActive
+                          ? "text-[var(--color-walnut-dark)] bg-[var(--color-ivory-deep)]"
+                          : "text-[var(--color-charcoal-soft)]"
+                      }`}
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                  {idx === 0 && (
+                    <li>
+                      <a
+                        href="#/orders"
+                        onClick={() => setOpen(false)}
+                        aria-current={ordersActive ? "page" : undefined}
+                        className={`flex items-center gap-2 px-3 py-3 text-base rounded-md ${
+                          ordersActive
+                            ? "text-[var(--color-walnut-dark)] bg-[var(--color-ivory-deep)]"
+                            : "text-[var(--color-charcoal-soft)]"
+                        }`}
+                      >
+                        <ShoppingBag size={16} aria-hidden /> Shop
+                      </a>
+                    </li>
+                  )}
+                </Fragment>
               );
             })}
-            <li>
-              <a
-                href="#/orders"
-                onClick={() => setOpen(false)}
-                aria-current={ordersActive ? "page" : undefined}
-                className={`flex items-center gap-2 px-3 py-3 text-base rounded-md ${
-                  ordersActive
-                    ? "text-[var(--color-walnut-dark)] bg-[var(--color-ivory-deep)]"
-                    : "text-[var(--color-charcoal-soft)]"
-                }`}
-              >
-                <ShoppingBag size={16} aria-hidden /> Shop
-              </a>
-            </li>
           </ul>
         )}
       </nav>
