@@ -1,7 +1,24 @@
 import { useState } from "react";
+import type { ReactNode, FormEvent } from "react";
 import { Mail } from "lucide-react";
 import { Section } from "./Section";
 import { site } from "../data/site.config";
+
+// NOTE: Field is defined at module scope on purpose. Defining it inside
+// the Custom function would re-create the component on every render, causing
+// React to unmount/remount the <input>s inside and lose focus after each keystroke.
+function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-medium text-[var(--color-walnut-dark)] mb-1.5">{label}</span>
+      {children}
+      {hint && <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">{hint}</span>}
+    </label>
+  );
+}
+
+const inputCls =
+  "w-full rounded-lg bg-[var(--color-ivory)] border border-[color-mix(in_oklab,var(--color-walnut)_20%,transparent)] px-3.5 py-2.5 text-[15px] placeholder:text-[var(--color-charcoal-soft)]/50 focus:border-[var(--color-walnut)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)]/50 transition-colors";
 
 export function Custom() {
   const [name, setName] = useState("");
@@ -11,33 +28,22 @@ export function Custom() {
 
   const canSend = site.contact.email.trim().length > 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSend) return;
-    const subject = encodeURIComponent(`KKEngravingsX — custom request from ${name || "a new customer"}`);
+    const subject = encodeURIComponent(`KK Engravings custom request from ${name || "a new customer"}`);
     const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "—"}\n\nWhat I'd like:\n${idea}\n\n—\nSent from KKEngravingsX website`,
+      `Name: ${name}\nEmail: ${email}\nOccasion / date: ${occasion || "Not specified"}\n\nWhat I'd like:\n${idea}\n\nSent from the KK Engravings website.`,
     );
     window.location.href = `mailto:${site.contact.email}?subject=${subject}&body=${body}`;
   };
-
-  const Field = ({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) => (
-    <label className="block">
-      <span className="block text-sm font-medium text-[var(--color-walnut-dark)] mb-1.5">{label}</span>
-      {children}
-      {hint && <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">{hint}</span>}
-    </label>
-  );
-
-  const inputCls =
-    "w-full rounded-lg bg-[var(--color-ivory)] border border-[color-mix(in_oklab,var(--color-walnut)_20%,transparent)] px-3.5 py-2.5 text-[15px] placeholder:text-[var(--color-charcoal-soft)]/50 focus:border-[var(--color-walnut)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)]/50 transition-colors";
 
   return (
     <Section id="custom" eyebrow="Custom Requests" title="Have an idea? Let’s make it." tone="ivory-deep">
       <div className="grid md:grid-cols-[1fr_1.1fr] gap-10 lg:gap-14 items-start">
         <div className="max-w-md space-y-5 text-[var(--color-charcoal-soft)]">
           <p className="text-[1.05rem] leading-relaxed">
-            From monogrammed coasters to personalized name puzzles — tell me about the piece you’re imagining and I’ll be in touch with next steps, timelines, and a quote.
+            From monogrammed coasters to personalized name puzzles, tell me about the piece you’re imagining and I’ll be in touch with next steps, timelines, and a quote.
           </p>
           <ul className="space-y-2.5 text-sm">
             <li className="flex items-start gap-2">
@@ -46,7 +52,7 @@ export function Custom() {
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-2 size-1 rounded-full bg-[var(--color-walnut)]" />
-              <span>Materials vary by design — wood, slate, acrylic, and leather.</span>
+              <span>Materials vary by design: wood, slate, acrylic, and leather.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-2 size-1 rounded-full bg-[var(--color-walnut)]" />
@@ -82,7 +88,7 @@ export function Custom() {
               />
             </Field>
           </div>
-          <Field label="What would you like?" hint="A short sketch of the idea — names, materials, size, mood.">
+          <Field label="What would you like?" hint="A short sketch of the idea: names, materials, size, mood.">
             <textarea
               required
               value={idea}
@@ -122,7 +128,7 @@ export function Custom() {
                   Send request
                 </button>
                 <p className="mt-3 text-xs text-[var(--color-charcoal-soft)] italic">
-                  Contact details coming soon — check back shortly.
+                  Contact details coming soon. Check back shortly.
                 </p>
               </div>
             )}

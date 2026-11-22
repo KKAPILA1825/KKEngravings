@@ -34,7 +34,7 @@ export function Nav() {
   return (
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-[background,backdrop-filter,box-shadow] duration-300 ${
-        scrolled
+        scrolled || open
           ? "bg-[color-mix(in_oklab,var(--color-ivory)_88%,transparent)] backdrop-blur-md shadow-[0_1px_0_rgba(107,68,35,0.08)]"
           : "bg-transparent"
       }`}

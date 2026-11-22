@@ -11,12 +11,13 @@ export function About() {
               {para}
             </p>
           ))}
-          <p className="pt-2 text-sm text-[var(--color-charcoal-soft)]/80">
-            — {site.creator}
+          <p className="pt-3 flex items-center gap-3 text-[var(--color-walnut)]/85">
+            <span aria-hidden className="h-px w-8 bg-[var(--color-gold)]/70" />
+            <span className="font-serif italic text-base">{site.creator}</span>
           </p>
         </div>
 
-        {/* Wood-grain quote card (no portrait — minor privacy) */}
+        {/* Wood-grain quote card (no portrait, per minor-privacy policy) */}
         <aside
           className="relative overflow-hidden rounded-2xl p-7 sm:p-9 shadow-[var(--shadow-soft)]"
           style={{
@@ -33,7 +34,7 @@ export function About() {
             }}
           />
           <p className="relative font-serif text-[var(--color-ivory)] text-xl sm:text-2xl leading-snug">
-            “Every piece begins as a simple idea — and ends as something worth keeping.”
+            “Every piece begins as a simple idea, and ends as something worth keeping.”
           </p>
           <p className="relative mt-5 text-xs uppercase tracking-[0.25em] text-[var(--color-gold-soft)]">
             The workshop promise

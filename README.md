@@ -1,6 +1,6 @@
-# KKEngravingsX
+# KK Engravings
 
-A single-page business website for **KKEngravingsX** — personalized engravings, wooden gifts, and handcrafted creative products by Kaundinya Kapila.
+A single-page business website for **KK Engravings** — personalized engravings, wooden gifts, and handcrafted creative products by Kaundinya Kapila.
 
 Built with React 19 + Vite 7 + TypeScript + Tailwind v4.
 
@@ -64,7 +64,7 @@ All editorial content lives in a single file: **`src/data/site.config.ts`**. Com
 
 ```ts
 export const site = {
-  name: "KKEngravingsX",
+  name: "KK Engravings",
   tagline: "Personalized Creations, Made to Remember",
   creator: "Kaundinya Kapila",
 
