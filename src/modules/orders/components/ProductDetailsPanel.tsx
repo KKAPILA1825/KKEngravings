@@ -139,13 +139,10 @@ export function ProductDetailsPanel({ design, onViewCart }: Props) {
           value={engravingText}
           onChange={(e) => setEngraving(e.target.value.slice(0, MAX_ENGRAVING))}
           rows={5}
-          placeholder={`e.g. ${design.title}\nPlease engrave our family name and "Est. 2019" in a cursive font.`}
+          placeholder={`e.g. Please engrave our family name and "Est. 2019" in a cursive font.`}
           className={`${inputCls} resize-y min-h-[120px]`}
           required
         />
-        <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">
-          Start with the design name (copy from above), then your instructions on the next line.
-        </span>
       </label>
 
       <label className="block">
