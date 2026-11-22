@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, Mail, RefreshCw, Send, ShoppingBag } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, Info, Mail, RefreshCw, Send, ShoppingBag } from "lucide-react";
 import type { CheckoutStep, ShippingAddress } from "../types";
 import { useCart } from "../cart";
-import { CartLineItem } from "../components/CartLineItem";
 import {
   emptyShipping,
   validateShipping,
@@ -14,7 +13,6 @@ import { navigate, leaveOrders } from "../router";
 import { site } from "../../../data/site.config";
 
 const STEPS: readonly { id: CheckoutStep; label: string }[] = [
-  { id: "review", label: "Order Review" },
   { id: "shipping", label: "Shipping" },
   { id: "payment", label: "Send Request" },
 ];
@@ -59,7 +57,7 @@ function Stepper({ current }: { current: CheckoutStep }) {
 
 export function CheckoutPage() {
   const { cart, clearCart } = useCart();
-  const [step, setStep] = useState<CheckoutStep>("review");
+  const [step, setStep] = useState<CheckoutStep>("shipping");
   const [shipping, setShipping] = useState<ShippingAddress>(emptyShipping);
   const [errors, setErrors] = useState<ShippingErrors>({});
   const [sending, setSending] = useState(false);
@@ -88,7 +86,6 @@ export function CheckoutPage() {
     );
   }
 
-  const continueToShipping = () => setStep("shipping");
   const continueToPayment = () => {
     const errs = validateShipping(shipping);
     setErrors(errs);
@@ -130,22 +127,25 @@ export function CheckoutPage() {
           ? "Order received"
           : step === "mailto-opened"
             ? "Almost there"
-            : "Review your order"}
+            : "Shipping details"}
       </h1>
 
       {step !== "success" && step !== "mailto-opened" && <Stepper current={step} />}
 
-      {step === "review" && (
+      {step === "shipping" && (
         <>
-          <ul className="bg-[var(--color-ivory-soft)] rounded-2xl p-5 sm:p-6 shadow-[var(--shadow-soft)]">
-            {cart.items.map((it) => (
-              <CartLineItem key={it.id} item={it} />
-            ))}
-          </ul>
-          <p className="mt-4 text-sm text-[var(--color-charcoal-soft)]/80">
-            Prices, shipping, and final materials will be confirmed by KK Engravings after
-            reviewing your request.
-          </p>
+          <div
+            role="note"
+            className="mb-5 flex items-start gap-2 rounded-lg bg-[color-mix(in_oklab,var(--color-gold)_14%,var(--color-ivory))] border border-[color-mix(in_oklab,var(--color-gold)_35%,transparent)] px-4 py-3 text-sm text-[var(--color-walnut-dark)]"
+          >
+            <Info className="shrink-0 mt-0.5" size={16} aria-hidden />
+            <span>
+              <strong>Shipping rates apply</strong> — included in your final quote from KK.
+            </span>
+          </div>
+          <div className="bg-[var(--color-ivory-soft)] rounded-2xl p-5 sm:p-7 shadow-[var(--shadow-soft)]">
+            <ShippingForm value={shipping} errors={errors} onChange={setShipping} />
+          </div>
           <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
             <button
               type="button"
@@ -153,30 +153,6 @@ export function CheckoutPage() {
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
             >
               <ArrowLeft size={16} /> Back to cart
-            </button>
-            <button
-              type="button"
-              onClick={continueToShipping}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[var(--color-walnut-dark)] text-[var(--color-ivory)] text-sm font-medium hover:bg-[var(--color-walnut)]"
-            >
-              Continue to shipping <ArrowRight size={16} />
-            </button>
-          </div>
-        </>
-      )}
-
-      {step === "shipping" && (
-        <>
-          <div className="bg-[var(--color-ivory-soft)] rounded-2xl p-5 sm:p-7 shadow-[var(--shadow-soft)]">
-            <ShippingForm value={shipping} errors={errors} onChange={setShipping} />
-          </div>
-          <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setStep("review")}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-walnut)]/30 text-sm text-[var(--color-walnut-dark)] hover:bg-[var(--color-ivory-soft)]"
-            >
-              <ArrowLeft size={16} /> Back to review
             </button>
             <button
               type="button"
