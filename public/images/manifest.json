@@ -88,6 +88,14 @@
     "height": 1064
   },
   {
+    "source": "mt-rainier-wallpiece~2.jpg",
+    "slug": "mt-rainier-wallpiece-2",
+    "thumb": "/images/mt-rainier-wallpiece-2.thumb.webp",
+    "full": "/images/mt-rainier-wallpiece-2.webp",
+    "width": 1600,
+    "height": 533
+  },
+  {
     "source": "Nardo_s Coaster.jpg",
     "slug": "nardo-s-coaster",
     "thumb": "/images/nardo-s-coaster.thumb.webp",
@@ -286,14 +294,6 @@
     "full": "/images/screenshot-20250218-212339.webp",
     "width": 1007,
     "height": 739
-  },
-  {
-    "source": "WhatsApp Image 2026-11-20 at 1.14.19 PM.jpeg",
-    "slug": "whatsapp-image-2026-11-20-at-1-14-19-pm",
-    "thumb": "/images/whatsapp-image-2026-11-20-at-1-14-19-pm.thumb.webp",
-    "full": "/images/whatsapp-image-2026-11-20-at-1-14-19-pm.webp",
-    "width": 1600,
-    "height": 555
   },
   {
     "source": "width_722.png",

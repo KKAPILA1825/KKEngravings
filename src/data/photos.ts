@@ -324,14 +324,14 @@ export const photos: readonly Photo[] = [
     "height": 2400
   },
   {
-    "slug": "whatsapp-image-2026-11-20-at-1-14-19-pm",
+    "slug": "mt-rainier-wallpiece-2",
     "title": "“Mt. Rainier, WA” Layered Wall Piece",
     "category": "Wall Art",
     "alt": "Wide layered wall art piece showing the Mount Rainier mountain silhouette rising above a dark pine-tree treeline, labeled Mt. Rainier WA.",
-    "thumb": "/images/whatsapp-image-2026-11-20-at-1-14-19-pm.thumb.webp",
-    "full": "/images/whatsapp-image-2026-11-20-at-1-14-19-pm.webp",
+    "thumb": "/images/mt-rainier-wallpiece-2.thumb.webp",
+    "full": "/images/mt-rainier-wallpiece-2.webp",
     "width": 1600,
-    "height": 555
+    "height": 533
   },
   {
     "slug": "pxl-20251201-013926763-portrait",

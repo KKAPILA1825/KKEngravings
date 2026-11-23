@@ -92,7 +92,7 @@ const META = {
   "PXL_20251219_130554466~2.jpg": { title: "Teacher Sweater Ornaments · Kronitz, O’Malley, Dunavant & Lehman", category: "Ornaments", alt: "Four wooden Christmas sweater ornaments personalized with the teacher names Mrs. Kronitz, Mrs. O’Malley, Mr. Dunavant, and Mr. Lehman, arranged on a red knitted sweater background." },
   "Screenshot_20250217-125534~2.png": { title: "“Mum, You Are the Piece That Holds Us Together” Puzzle Plaque", category: "Family Keepsakes", alt: "Framed wooden plaque reading Mum You Are The Piece That Holds Us Together, with an interlocking puzzle piece arrangement engraved with the names Dad, Mum, Jack, Carol, and Arlene." },
   "Screenshot_20250218-210523.png": { title: "“Kaitlyn & Michael” Engaged 2023 Mountain Ornament", category: "Milestones", alt: "Round wooden ornament with a layered mountain and tree scene, engraved Our Adventure Awaits Kaitlyn & Michael Engaged 2023." },
-  "WhatsApp Image 2026-11-20 at 1.14.19 PM.jpeg": { title: "“Mt. Rainier, WA” Layered Wall Piece", category: "Wall Art", alt: "Wide layered wall art piece showing the Mount Rainier mountain silhouette rising above a dark pine-tree treeline, labeled Mt. Rainier WA." },
+  "mt-rainier-wallpiece~2.jpg": { title: "“Mt. Rainier, WA” Layered Wall Piece", category: "Wall Art", alt: "Wide layered wall art piece showing the Mount Rainier mountain silhouette rising above a dark pine-tree treeline, labeled Mt. Rainier WA." },
 
   // Excluded as near-duplicates of already-listed pieces (user prefers one canonical shot per item):
   // "PXL_20240723_215743241.MP.jpg":   variant of the KA Studios coaster (and shows a bare foot).
