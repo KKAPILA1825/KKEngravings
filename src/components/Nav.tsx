@@ -58,9 +58,18 @@ export function Nav() {
         <div className="flex items-center justify-between h-16 sm:h-20">
           <a
             href="#home"
-            className="font-serif text-[1.15rem] sm:text-xl tracking-tight text-[var(--color-walnut-dark)]"
+            className="inline-flex items-center gap-2.5 font-serif text-[1.15rem] sm:text-xl tracking-tight text-[var(--color-walnut-dark)]"
+            aria-label={`${site.name} — home`}
           >
-            {site.name}
+            <img
+              src="/kk-logo-horizontal.webp"
+              alt={site.name}
+              width={600}
+              height={200}
+              className="h-10 w-auto sm:h-12 rounded-sm"
+              decoding="async"
+            />
+            {/* <span>{site.name}</span> */}
           </a>
 
           <ul className="hidden md:flex items-center gap-1">

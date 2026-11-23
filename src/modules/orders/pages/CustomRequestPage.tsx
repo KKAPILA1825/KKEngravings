@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode, FormEvent } from "react";
 import { AlertTriangle, ArrowLeft, Check, Mail, RefreshCw, X } from "lucide-react";
 import { site } from "../../../data/site.config";
 import { photos } from "../../../data/photos";
 import type { Photo } from "../../../types";
 import { clearPicks, getPicks, removePick, togglePick, usePicks } from "../../../lib/gallery-picks";
+import { ReviewPromptDialog } from "../../reviews/components";
 import { navigate, leaveOrders } from "../router";
 
 function Field({
@@ -76,6 +77,18 @@ export function CustomRequestPage() {
   const [occasion, setOccasion] = useState("");
   const [state, setState] = useState<SendState>("idle");
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+
+  // When the submission succeeds, open the review prompt after a short beat
+  // so the success screen lands first and the dialog feels like a follow-up.
+  useEffect(() => {
+    if (state !== "success") {
+      setShowReviewPrompt(false);
+      return;
+    }
+    const t = window.setTimeout(() => setShowReviewPrompt(true), 900);
+    return () => window.clearTimeout(t);
+  }, [state]);
 
   // On first mount, merge any ?refs=slug1,slug2 from the URL into the shared
   // picks store. Unknown slugs silently dropped. Dedup preserved.
@@ -89,6 +102,16 @@ export function CustomRequestPage() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // One idempotency key per Custom Request mount — server dedups retries
+  // silently so double-clicks or Try-again never create a second row.
+  const idempotencyKeyRef = useRef<string>("");
+  if (idempotencyKeyRef.current === "") {
+    idempotencyKeyRef.current =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `cus_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+  }
 
   const picks = usePicks();
   const resolvedRefs = useMemo<Photo[]>(
@@ -109,36 +132,101 @@ export function CustomRequestPage() {
     clearPicks();
   };
 
-  const submitToNetlify = async (): Promise<void> => {
-    const referencesBlock = buildReferencesBlock(resolvedRefs);
-    const ideaWithRefs = referencesBlock ? `${referencesBlock}${idea}` : idea;
-    const params = new URLSearchParams();
-    params.set("form-name", "kk-engravings-custom");
-    params.set("bot-field", "");
-    params.set("customer_name", name);
-    params.set("email", email);
-    params.set("occasion", occasion);
-    params.set("idea", ideaWithRefs);
-    const res = await fetch("/", {
+  const submitToAppsScript = async (): Promise<void> => {
+    const endpoint = (
+      (import.meta.env?.VITE_REVIEWS_ENDPOINT as string | undefined) ?? ""
+    ).trim();
+    if (!endpoint) throw new Error("missing-endpoint");
+    const references = resolvedRefs.map((p) => ({
+      title: p.title,
+      imageFull:
+        typeof window !== "undefined"
+          ? `${window.location.origin}${p.full}`
+          : p.full,
+    }));
+    const payload = {
+      idempotencyKey: idempotencyKeyRef.current,
+      fullName: name,
+      email,
+      occasion,
+      idea,
+      references,
+    };
+    const res = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ type: "custom", payload }),
     });
     if (!res.ok) throw new Error(`Submission failed (${res.status})`);
+    const data = (await res.json()) as {
+      ok: boolean;
+      id?: string;
+      reason?: string;
+      details?: string[];
+    };
+    if (!data.ok) {
+      const detail =
+        data.details && data.details.length > 0
+          ? ` (${data.details.join(", ")})`
+          : "";
+      throw new Error((data.reason || "submit-failed") + detail);
+    }
+  };
+
+  // Netlify Forms submission is disabled while hosting on AWS Amplify.
+  // Kept as a commented reference for a future return to Netlify or a
+  // one-line swap to an Apps Script endpoint.
+  // const submitToNetlify = async (): Promise<void> => {
+  //   const referencesBlock = buildReferencesBlock(resolvedRefs);
+  //   const ideaWithRefs = referencesBlock ? `${referencesBlock}${idea}` : idea;
+  //   const params = new URLSearchParams();
+  //   params.set("form-name", "kk-engravings-custom");
+  //   params.set("bot-field", "");
+  //   params.set("customer_name", name);
+  //   params.set("email", email);
+  //   params.set("occasion", occasion);
+  //   params.set("idea", ideaWithRefs);
+  //   const res = await fetch("/", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  //     body: params.toString(),
+  //   });
+  //   if (!res.ok) throw new Error(`Submission failed (${res.status})`);
+  // };
+
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string;
+    email?: string;
+    idea?: string;
+  }>({});
+
+  const validate = (): typeof fieldErrors => {
+    const errs: typeof fieldErrors = {};
+    if (!name.trim()) errs.name = "Your name is required.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      errs.email = "Enter a valid email.";
+    if (idea.trim().length < 10)
+      errs.idea = `Please write at least 10 characters so KK understands your request.`;
+    return errs;
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!canSend || state === "sending") return;
+    const errs = validate();
+    setFieldErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     setState("sending");
     setErrorDetail(null);
     try {
-      await submitToNetlify();
+      await submitToAppsScript();
       setState("success");
       resetForm();
     } catch (err) {
-      console.warn("[KK Custom] Netlify submission failed:", err);
-      setErrorDetail(err instanceof Error ? err.message : "Could not reach our server.");
+      console.warn("[KK Custom] Apps Script submission failed:", err);
+      setErrorDetail(
+        err instanceof Error ? err.message : "Could not reach our server.",
+      );
       setState("error");
     }
   };
@@ -256,20 +344,48 @@ export function CustomRequestPage() {
                 type="text"
                 required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (fieldErrors.name)
+                    setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                }}
                 autoComplete="name"
-                className={inputCls}
+                className={`${inputCls} ${
+                  fieldErrors.name
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                    : ""
+                }`}
+                aria-invalid={!!fieldErrors.name}
               />
+              {fieldErrors.name && (
+                <span role="alert" className="block mt-1 text-xs text-red-700">
+                  {fieldErrors.name}
+                </span>
+              )}
             </Field>
             <Field label="Email">
               <input
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email)
+                    setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                }}
                 autoComplete="email"
-                className={inputCls}
+                className={`${inputCls} ${
+                  fieldErrors.email
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                    : ""
+                }`}
+                aria-invalid={!!fieldErrors.email}
               />
+              {fieldErrors.email && (
+                <span role="alert" className="block mt-1 text-xs text-red-700">
+                  {fieldErrors.email}
+                </span>
+              )}
             </Field>
           </div>
           {resolvedRefs.length > 0 && (
@@ -310,18 +426,47 @@ export function CustomRequestPage() {
             </div>
           )}
 
-          <Field
-            label="What would you like?"
-            hint="A short sketch of the idea: names, materials, size, mood."
-          >
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-sm font-medium text-[var(--color-walnut-dark)]">
+                What would you like?
+              </span>
+              <span className="text-xs text-[var(--color-charcoal-soft)]/70 tabular-nums">
+                {idea.trim().length} / 10 min
+              </span>
+            </div>
             <textarea
               required
+              minLength={10}
               value={idea}
-              onChange={(e) => setIdea(e.target.value)}
+              onChange={(e) => {
+                setIdea(e.target.value);
+                if (fieldErrors.idea) {
+                  setFieldErrors((prev) => ({ ...prev, idea: undefined }));
+                }
+              }}
               rows={6}
-              className={`${inputCls} resize-y min-h-28`}
+              placeholder="A short sketch of your idea: names, materials, size, mood."
+              className={`${inputCls} resize-y min-h-28 ${
+                fieldErrors.idea
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                  : ""
+              }`}
+              aria-invalid={!!fieldErrors.idea}
             />
-          </Field>
+            {fieldErrors.idea ? (
+              <span
+                role="alert"
+                className="block mt-1 text-xs text-red-700"
+              >
+                {fieldErrors.idea}
+              </span>
+            ) : (
+              <span className="block mt-1 text-xs text-[var(--color-charcoal-soft)]/70">
+                A short sketch of the idea: names, materials, size, mood.
+              </span>
+            )}
+          </div>
           <Field label="Occasion or needed-by date (optional)">
             <input
               type="text"
@@ -401,6 +546,11 @@ export function CustomRequestPage() {
           </p>
         </form>
       )}
+
+      <ReviewPromptDialog
+        open={showReviewPrompt}
+        onClose={() => setShowReviewPrompt(false)}
+      />
     </div>
   );
 }

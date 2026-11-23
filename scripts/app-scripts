@@ -1,0 +1,1200 @@
+// ============================================================================
+// KK Engravings — Apps Script source vault
+// ----------------------------------------------------------------------------
+// This file is NOT executed. It's a repo-local reference copy of the code
+// that lives in your Google Apps Script project bound to the "KK Engravings
+// Submissions" spreadsheet.
+//
+// How to use:
+//   1. Open your bound Apps Script project (in the sheet: Extensions -> Apps Script).
+//   2. For each section below, create a `.gs` file with the EXACT file name
+//      shown in the header, then paste that section's contents into it.
+//   3. Save -> run tests (see Testing.gs) -> deploy as Web App.
+//
+// Schema (slim human-readable design):
+//   Reviews  (8 cols): Timestamp | ID | Reviewer | Rating | Review | Design | Published | Notes
+//   Orders   (7 cols): Timestamp | ID | Customer | Shipping to | Order | Status | Notes   (INACTIVE)
+//   Custom   (7 cols): Timestamp | ID | Customer | Occasion | Request | Status | Notes    (INACTIVE)
+//
+// Rate limiting lives in PropertiesService (not in the sheet). Honeypot is
+// in-code and never logged. Published is a checkbox KK manually flips.
+// ============================================================================
+
+
+// ============================================================================
+// File 1 / 7  --  Config.gs
+// ============================================================================
+
+const RECIPIENT_EMAIL = 'kk.engraving.llc@gmail.com';
+
+const SHEET_NAMES = {
+  reviews: 'Reviews',
+  orders: 'Orders',
+  custom: 'Custom Requests',
+};
+
+const FLAGS = {
+  reviewsActive: true,
+  ordersActive: true,
+  customActive: true,
+};
+
+const LIMITS = {
+  reviewBodyMin: 20,
+  reviewBodyMax: 2000,
+  reviewHeadlineMax: 120,
+  firstNameMax: 40,
+  lastInitialMax: 3,
+  cityMax: 60,
+  stateMax: 30,
+  emailMax: 200,
+  designRefMax: 120,
+  payloadMaxBytes: 10 * 1024,
+  rateLimitWindowMs: 24 * 60 * 60 * 1000, // used for reviews only
+  idempotencyTtlMs: 10 * 60 * 1000,       // 10-minute per-submission key
+  contentDedupWindowMs: 60 * 1000,        // 60-second safety net
+  lockTimeoutMs: 15 * 1000,
+};
+
+// ---------- Reviews (ACTIVE) ----------
+const REVIEW_COLUMNS = [
+  'Timestamp', 'ID', 'Reviewer', 'Rating', 'Review', 'Design', 'Published', 'Notes',
+];
+const REVIEW_COLUMN_ALIASES = {
+  'Timestamp': 'Timestamp',
+  'ID': 'ID',
+  'Reviewer': 'Reviewer',
+  'Rating': 'Rating',
+  'Review': 'Review',
+  'Design': 'Design',
+  'Published': 'Published',
+  'Notes': 'Notes',
+};
+const REVIEW_WRAPPED_COLUMNS = ['Reviewer', 'Review', 'Design', 'Notes'];
+const REVIEW_ID_PREFIX = 'REV-';
+
+// ---------- Orders (INACTIVE -- prepared) ----------
+const ORDER_COLUMNS = [
+  'Timestamp', 'ID', 'Customer', 'Shipping to', 'Order', 'Status', 'Notes',
+];
+const ORDER_COLUMN_ALIASES = {
+  'Timestamp': 'Timestamp',
+  'ID': 'ID',
+  'Customer': 'Customer',
+  'Shipping to': 'Shipping to',
+  'Order': 'Order',
+  'Status': 'Status',
+  'Notes': 'Notes',
+};
+const ORDER_WRAPPED_COLUMNS = ['Customer', 'Shipping to', 'Order', 'Notes'];
+const ORDER_ID_PREFIX = 'ORD-';
+
+// ---------- Custom Requests (INACTIVE -- prepared) ----------
+const CUSTOM_COLUMNS = [
+  'Timestamp', 'ID', 'Customer', 'Occasion', 'Request', 'Status', 'Notes',
+];
+const CUSTOM_COLUMN_ALIASES = {
+  'Timestamp': 'Timestamp',
+  'ID': 'ID',
+  'Customer': 'Customer',
+  'Occasion': 'Occasion',
+  'Request': 'Request',
+  'Status': 'Status',
+  'Notes': 'Notes',
+};
+const CUSTOM_WRAPPED_COLUMNS = ['Customer', 'Request', 'Notes'];
+const CUSTOM_ID_PREFIX = 'CUS-';
+
+
+// ============================================================================
+// File 2 / 7  --  Main.gs
+// ============================================================================
+
+function doPost(e) {
+  try {
+    const raw = e && e.postData && e.postData.contents;
+    if (!raw) return jsonResponse_({ ok: false, reason: 'no-body' });
+    if (raw.length > LIMITS.payloadMaxBytes) {
+      return jsonResponse_({ ok: false, reason: 'payload-too-large' });
+    }
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch (err) {
+      return jsonResponse_({ ok: false, reason: 'invalid-json' });
+    }
+
+    const type = String(body.type || '').toLowerCase();
+    const payload = body.payload || {};
+
+    switch (type) {
+      case 'review':
+        if (!FLAGS.reviewsActive) return jsonResponse_({ ok: false, reason: 'not-active' });
+        return handleReviewSubmission_(payload);
+      case 'order':
+        if (!FLAGS.ordersActive) return jsonResponse_({ ok: false, reason: 'not-active' });
+        return handleOrderSubmission_(payload);
+      case 'custom':
+        if (!FLAGS.customActive) return jsonResponse_({ ok: false, reason: 'not-active' });
+        return handleCustomSubmission_(payload);
+      default:
+        return jsonResponse_({ ok: false, reason: 'unknown-type' });
+    }
+  } catch (err) {
+    console.error('[KK] doPost:', (err && err.stack) || err);
+    return jsonResponse_({ ok: false, reason: 'server-error' });
+  }
+}
+
+function doGet(e) {
+  try {
+    const type = String((e && e.parameter && e.parameter.type) || '').toLowerCase();
+    if (type === 'reviews') {
+      if (!FLAGS.reviewsActive) return jsonResponse_({ ok: false, reason: 'not-active' });
+      return fetchPublishedReviews_();
+    }
+    return jsonResponse_({ ok: false, reason: 'unknown-type' });
+  } catch (err) {
+    console.error('[KK] doGet:', (err && err.stack) || err);
+    return jsonResponse_({ ok: false, reason: 'server-error' });
+  }
+}
+
+function jsonResponse_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+
+// ============================================================================
+// File 3 / 7  --  Reviews.gs
+// ============================================================================
+
+function handleReviewSubmission_(payload) {
+  const validation = validateReview_(payload || {});
+  if (validation.honeypotTripped) {
+    return jsonResponse_({ ok: true, id: 'HP-DROPPED' });
+  }
+  if (validation.errors && validation.errors.length > 0) {
+    return jsonResponse_({ ok: false, reason: 'invalid', details: validation.errors });
+  }
+  const p = validation.sanitized;
+
+  if (checkEmailRateLimit_('rev', p.email).rateLimited) {
+    return jsonResponse_({ ok: false, reason: 'rate-limited' });
+  }
+
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(LIMITS.lockTimeoutMs);
+
+  let id;
+  try {
+    const sheet = getSheet_(SHEET_NAMES.reviews);
+    ensureColumns_(sheet, REVIEW_COLUMNS, REVIEW_COLUMN_ALIASES);
+    const colMap = readHeaderMap_(sheet, REVIEW_COLUMN_ALIASES);
+
+    id = generateIdWithinLock_(sheet, colMap, REVIEW_ID_PREFIX);
+    const row = buildReviewRow_(id, p, colMap);
+    sheet.appendRow(row);
+  } finally {
+    lock.releaseLock();
+  }
+
+  try {
+    applySheetFormatting_(
+      getSheet_(SHEET_NAMES.reviews),
+      REVIEW_COLUMNS,
+      REVIEW_WRAPPED_COLUMNS,
+      REVIEW_COLUMN_ALIASES
+    );
+  } catch (err) {
+    console.warn('[KK] formatting skipped:', err && err.message);
+  }
+
+  recordEmailRateLimit_('rev', p.email);
+  if (Math.random() < 0.1) {
+    try { cleanup_ExpiredRateLimits_(); } catch (err) { /* ignore */ }
+  }
+
+  let emailStatus;
+  try {
+    sendReviewAlertEmail_(id, p);
+    emailStatus = 'sent';
+  } catch (err) {
+    emailStatus = 'failed: ' + ((err && err.message) || 'unknown');
+    console.error('[KK] email send failed for', id, err);
+  }
+  console.log('[KK] review', id, 'email:', emailStatus);
+
+  return jsonResponse_({ ok: true, id: id, emailStatus: emailStatus });
+}
+
+function fetchPublishedReviews_() {
+  const sheet = getSheet_(SHEET_NAMES.reviews);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return jsonResponse_({ ok: true, reviews: [], stats: emptyStats_() });
+  }
+  const colMap = readHeaderMap_(sheet, REVIEW_COLUMN_ALIASES);
+  const lastCol = sheet.getLastColumn();
+  const data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+  const reviews = [];
+  for (let i = 0; i < data.length; i++) {
+    const row = data[i];
+    const published = row[colMap['Published']];
+    const isPublished =
+      published === true || String(published).toLowerCase() === 'true';
+    if (!isPublished) continue;
+
+    const parsedReview = parseReviewCell_(row[colMap['Review']]);
+    const parsedReviewer = parseReviewerCell_(row[colMap['Reviewer']]);
+    const ts = row[colMap['Timestamp']];
+    const publishedAt = ts instanceof Date ? ts.toISOString() : String(ts || '');
+
+    reviews.push({
+      id: String(row[colMap['ID']] || ''),
+      rating: parseRating_(row[colMap['Rating']]),
+      firstName: parsedReviewer.firstName,
+      lastInitial: parsedReviewer.lastInitial,
+      city: parsedReviewer.city,
+      state: parsedReviewer.state,
+      // email intentionally stripped from public response
+      headline: parsedReview.headline,
+      body: parsedReview.body,
+      design: String(row[colMap['Design']] || ''),
+      publishedAt: publishedAt,
+    });
+  }
+  reviews.sort(function (a, b) {
+    return (b.publishedAt || '').localeCompare(a.publishedAt || '');
+  });
+  return jsonResponse_({ ok: true, reviews: reviews, stats: computeStats_(reviews) });
+}
+
+// ---------- row building ----------
+
+function buildReviewRow_(id, p, colMap) {
+  let width = 0;
+  for (const k in colMap) if (colMap[k] + 1 > width) width = colMap[k] + 1;
+  const row = new Array(width).fill('');
+  const put = function (name, value) {
+    const i = colMap[name];
+    if (i !== undefined) row[i] = value;
+  };
+  put('Timestamp', new Date());
+  put('ID', id);
+  put('Reviewer', composeReviewer_(p));
+  put('Rating', composeRating_(p.rating));
+  put('Review', composeReview_(p));
+  put('Design', composeDesignName_(p.referencedDesign));
+  put('Published', false);
+  // 'Notes' intentionally left blank -- KK fills manually
+  return row;
+}
+
+function composeReviewer_(p) {
+  const parts = [];
+  parts.push(p.firstName + (p.lastInitial ? ' ' + p.lastInitial : ''));
+  const location = [p.city, p.state].filter(Boolean).join(', ');
+  if (location) parts.push(location);
+  if (p.email) parts.push(p.email);
+  return parts.join(' · ');
+}
+
+function composeRating_(n) {
+  return '★'.repeat(n) + '☆'.repeat(5 - n) + ' (' + n + ')';
+}
+
+function composeReview_(p) {
+  if (p.headline && p.body) return p.headline + '\n\n' + p.body;
+  return p.headline || p.body || '';
+}
+
+function composeDesignName_(slug) {
+  if (!slug) return '';
+  return String(slug)
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map(function (w) { return w[0].toUpperCase() + w.slice(1).toLowerCase(); })
+    .join(' ');
+}
+
+// ---------- parse display cells for public API ----------
+
+function parseRating_(val) {
+  if (typeof val === 'number') return Math.max(1, Math.min(5, Math.round(val)));
+  const s = String(val || '');
+  const m = s.match(/\((\d+)\)/);
+  if (m) return Math.max(1, Math.min(5, parseInt(m[1], 10)));
+  const stars = (s.match(/★/g) || []).length;
+  return stars > 0 ? stars : 0;
+}
+
+function parseReviewCell_(val) {
+  const s = String(val || '');
+  const parts = s.split(/\n\s*\n/);
+  if (parts.length >= 2) {
+    return { headline: parts[0].trim(), body: parts.slice(1).join('\n\n').trim() };
+  }
+  return { headline: '', body: s.trim() };
+}
+
+function parseReviewerCell_(val) {
+  const s = String(val || '');
+  const parts = s.split(/\s·\s/).map(function (x) { return x.trim(); }).filter(Boolean);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const result = { firstName: '', lastInitial: '', city: '', state: '' };
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (emailRegex.test(part)) continue; // strip email from public response
+    if (!result.firstName) {
+      const m = part.match(/^(\S+)\s+(\S{1,3}\.?)$/);
+      if (m) {
+        result.firstName = m[1];
+        result.lastInitial = m[2].endsWith('.') ? m[2] : m[2] + '.';
+      } else {
+        result.firstName = part;
+      }
+    } else if (!result.city) {
+      const m = part.match(/^(.+?),\s*(.+)$/);
+      if (m) {
+        result.city = m[1].trim();
+        result.state = m[2].trim();
+      } else {
+        result.city = part;
+      }
+    }
+  }
+  return result;
+}
+
+// ---------- shared helpers ----------
+
+function getSheet_(name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(name);
+  if (!sheet) throw new Error('Sheet not found: ' + name);
+  return sheet;
+}
+
+function readHeaderMap_(sheet, aliases) {
+  const lastCol = sheet.getLastColumn() || 1;
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const headerIndex = {};
+  for (let i = 0; i < headers.length; i++) {
+    const name = String(headers[i] || '').trim();
+    if (name) headerIndex[name] = i;
+  }
+  const map = {};
+  for (const internal in aliases) {
+    const actual = aliases[internal];
+    const idx = headerIndex[actual];
+    if (idx !== undefined) map[internal] = idx;
+  }
+  return map;
+}
+
+function generateIdWithinLock_(sheet, colMap, prefix) {
+  const lastRow = sheet.getLastRow();
+  let maxN = 0;
+  if (lastRow >= 2 && colMap['ID'] !== undefined) {
+    const data = sheet.getRange(2, colMap['ID'] + 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < data.length; i++) {
+      const v = String(data[i][0] || '');
+      if (v.indexOf(prefix) === 0) {
+        const n = parseInt(v.slice(prefix.length), 10);
+        if (!isNaN(n) && n > maxN) maxN = n;
+      }
+    }
+  }
+  return prefix + String(maxN + 1).padStart(4, '0');
+}
+
+function computeStats_(reviews) {
+  if (!reviews || reviews.length === 0) return emptyStats_();
+  const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  let sum = 0;
+  for (let i = 0; i < reviews.length; i++) {
+    const n = Math.max(1, Math.min(5, Math.round(Number(reviews[i].rating) || 0)));
+    distribution[n] += 1;
+    sum += n;
+  }
+  return {
+    count: reviews.length,
+    average: Math.round((sum / reviews.length) * 10) / 10,
+    distribution: distribution,
+  };
+}
+
+function emptyStats_() {
+  return { count: 0, average: 0, distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
+}
+
+
+// ============================================================================
+// File 4 / 7  --  Validation.gs
+// ============================================================================
+
+function validateReview_(p) {
+  if (typeof p.hp === 'string' && p.hp.trim().length > 0) {
+    return { honeypotTripped: true, errors: [], sanitized: null };
+  }
+
+  const errors = [];
+
+  if (!(Number.isInteger(p.rating) && p.rating >= 1 && p.rating <= 5)) {
+    errors.push('invalid-rating');
+  }
+
+  const firstName = sanitize_(p.firstName, LIMITS.firstNameMax);
+  if (firstName.length < 1) errors.push('missing-first-name');
+
+  const email = sanitize_(p.email, LIMITS.emailMax).toLowerCase();
+  if (!isEmail_(email)) errors.push('invalid-email');
+
+  const body = sanitize_(p.body, LIMITS.reviewBodyMax);
+  if (body.length < LIMITS.reviewBodyMin) errors.push('body-too-short');
+
+  if (errors.length > 0) {
+    return { honeypotTripped: false, errors: errors, sanitized: null };
+  }
+
+  return {
+    honeypotTripped: false,
+    errors: [],
+    sanitized: {
+      rating: p.rating,
+      firstName: firstName,
+      lastInitial: sanitize_(p.lastInitial, LIMITS.lastInitialMax),
+      email: email,
+      city: sanitize_(p.city, LIMITS.cityMax),
+      state: sanitize_(p.state, LIMITS.stateMax),
+      headline: sanitize_(p.headline, LIMITS.reviewHeadlineMax),
+      body: body,
+      referencedDesign: sanitize_(p.referencedDesign, LIMITS.designRefMax),
+    },
+  };
+}
+
+function sanitize_(s, maxLen) {
+  if (typeof s !== 'string') return '';
+  const cleaned = s
+    .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200d\ufeff]/g, '')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
+  if (maxLen && cleaned.length > maxLen) return cleaned.slice(0, maxLen);
+  return cleaned;
+}
+
+function isEmail_(s) {
+  return typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+}
+
+// ---------- rate limit via Script Properties (not the sheet) ----------
+
+function checkEmailRateLimit_(typeKey, email) {
+  if (!email) return { rateLimited: false };
+  const props = PropertiesService.getScriptProperties();
+  const key = 'rl_' + typeKey + '_' + emailHash_(email);
+  const stored = props.getProperty(key);
+  if (stored) {
+    const ts = parseInt(stored, 10);
+    if (!isNaN(ts) && Date.now() - ts < LIMITS.rateLimitWindowMs) {
+      return { rateLimited: true };
+    }
+  }
+  return { rateLimited: false };
+}
+
+function recordEmailRateLimit_(typeKey, email) {
+  if (!email) return;
+  const props = PropertiesService.getScriptProperties();
+  const key = 'rl_' + typeKey + '_' + emailHash_(email);
+  props.setProperty(key, String(Date.now()));
+}
+
+function emailHash_(email) {
+  const bytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.MD5,
+    String(email).toLowerCase()
+  );
+  return bytes
+    .map(function (b) { return (b < 0 ? b + 256 : b).toString(16).padStart(2, '0'); })
+    .join('')
+    .slice(0, 20);
+}
+
+function cleanup_ExpiredRateLimits_() {
+  const props = PropertiesService.getScriptProperties();
+  const all = props.getProperties();
+  const now = Date.now();
+  let removed = 0;
+  for (const key in all) {
+    let ttl = 0;
+    if (key.indexOf('rl_') === 0) ttl = LIMITS.rateLimitWindowMs;
+    else if (key.indexOf('idem_') === 0) ttl = LIMITS.idempotencyTtlMs;
+    else if (key.indexOf('cdh_') === 0) ttl = LIMITS.contentDedupWindowMs;
+    else continue;
+    const raw = all[key];
+    let ts = 0;
+    try {
+      if (raw && raw.charAt(0) === '{') ts = JSON.parse(raw).ts || 0;
+      else ts = parseInt(raw, 10) || 0;
+    } catch (e) { ts = 0; }
+    if (ts > 0 && now - ts > ttl) {
+      props.deleteProperty(key);
+      removed++;
+    }
+  }
+  if (removed > 0) console.log('[KK] cleaned', removed, 'expired entries');
+}
+
+// ---------- Idempotency (per-submission key) + content dedup (short window) ----------
+// Used by Orders + Custom (NOT Reviews — reviews keep 24h per-email limit).
+
+function checkIdempotency_(typePrefix, idempotencyKey) {
+  if (!idempotencyKey) return { seen: false };
+  const props = PropertiesService.getScriptProperties();
+  const key = 'idem_' + typePrefix + '_' + idempotencyKey;
+  const raw = props.getProperty(key);
+  if (!raw) return { seen: false };
+  try {
+    const v = JSON.parse(raw);
+    if (Date.now() - v.ts > LIMITS.idempotencyTtlMs) return { seen: false };
+    return { seen: true, id: v.id, emailStatus: v.emailStatus };
+  } catch (e) { return { seen: false }; }
+}
+
+function recordIdempotency_(typePrefix, idempotencyKey, id, emailStatus) {
+  if (!idempotencyKey) return;
+  const props = PropertiesService.getScriptProperties();
+  const key = 'idem_' + typePrefix + '_' + idempotencyKey;
+  props.setProperty(key, JSON.stringify({ ts: Date.now(), id: id, emailStatus: emailStatus }));
+}
+
+function checkContentDedup_(typePrefix, contentHash) {
+  if (!contentHash) return { seen: false };
+  const props = PropertiesService.getScriptProperties();
+  const key = 'cdh_' + typePrefix + '_' + contentHash;
+  const raw = props.getProperty(key);
+  if (!raw) return { seen: false };
+  try {
+    const v = JSON.parse(raw);
+    if (Date.now() - v.ts > LIMITS.contentDedupWindowMs) return { seen: false };
+    return { seen: true, id: v.id, emailStatus: v.emailStatus };
+  } catch (e) { return { seen: false }; }
+}
+
+function recordContentDedup_(typePrefix, contentHash, id, emailStatus) {
+  if (!contentHash) return;
+  const props = PropertiesService.getScriptProperties();
+  const key = 'cdh_' + typePrefix + '_' + contentHash;
+  props.setProperty(key, JSON.stringify({ ts: Date.now(), id: id, emailStatus: emailStatus }));
+}
+
+function orderContentHash_(p) {
+  const summary = (p.items || []).map(function (it) {
+    return it.quantity + 'x|' + (it.designTitle || '') + '|' + (it.variantLabel || '') + '|' + (it.engravingText || '') + '|' + (it.occasionNote || '');
+  }).join(';;');
+  const material = [
+    (p.email || '').toLowerCase(),
+    (p.line1 || '').toLowerCase().trim(),
+    (p.postalCode || '').trim(),
+    summary,
+  ].join('||');
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_1, material);
+  return bytes.map(function (b) { return (b < 0 ? b + 256 : b).toString(16).padStart(2, '0'); }).join('').slice(0, 20);
+}
+
+function customContentHash_(p) {
+  const refs = (p.references || []).map(function (r) { return r.imageFull || r.title || ''; }).join(';;');
+  const material = [
+    (p.email || '').toLowerCase(),
+    (p.idea || '').trim().slice(0, 500),
+    (p.occasion || '').trim(),
+    refs,
+  ].join('||');
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_1, material);
+  return bytes.map(function (b) { return (b < 0 ? b + 256 : b).toString(16).padStart(2, '0'); }).join('').slice(0, 20);
+}
+
+
+// ============================================================================
+// File 5 / 7  --  Formatting.gs
+// ============================================================================
+
+function ensureColumns_(sheet, requiredInternalColumns, aliases) {
+  const currentLastCol = sheet.getLastColumn() || 1;
+  const headers =
+    currentLastCol >= 1
+      ? sheet.getRange(1, 1, 1, currentLastCol).getValues()[0]
+      : [];
+  const existing = new Set(
+    headers.map(function (h) { return String(h || '').trim(); }).filter(Boolean)
+  );
+
+  const toAdd = [];
+  for (let i = 0; i < requiredInternalColumns.length; i++) {
+    const internal = requiredInternalColumns[i];
+    const actual = (aliases && aliases[internal]) || internal;
+    if (!existing.has(actual)) toAdd.push(actual);
+  }
+  if (toAdd.length === 0) return;
+
+  if (existing.size === 0) {
+    const names = requiredInternalColumns.map(function (n) {
+      return (aliases && aliases[n]) || n;
+    });
+    sheet.getRange(1, 1, 1, names.length).setValues([names]);
+    return;
+  }
+
+  const startCol = currentLastCol + 1;
+  sheet.getRange(1, startCol, 1, toAdd.length).setValues([toAdd]);
+}
+
+function applySheetFormatting_(sheet, columnOrder, wrappedCols, aliases) {
+  const lastCol = sheet.getLastColumn();
+  if (lastCol < 1) return;
+
+  const headerRange = sheet.getRange(1, 1, 1, lastCol);
+  headerRange
+    .setFontWeight('bold')
+    .setBackground('#6b4423')
+    .setFontColor('#f7f1e7')
+    .setVerticalAlignment('middle')
+    .setHorizontalAlignment('left');
+
+  if (sheet.getFrozenRows() < 1) sheet.setFrozenRows(1);
+
+  const colMap = readHeaderMap_(sheet, aliases);
+  const maxRows = Math.max(sheet.getMaxRows(), 1000);
+
+  for (let i = 0; i < wrappedCols.length; i++) {
+    const colName = wrappedCols[i];
+    const idx = colMap[colName];
+    if (idx !== undefined) {
+      sheet
+        .getRange(1, idx + 1, maxRows, 1)
+        .setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+    }
+  }
+
+  sheet.autoResizeColumns(1, lastCol);
+  for (let i = 0; i < wrappedCols.length; i++) {
+    const colName = wrappedCols[i];
+    const idx = colMap[colName];
+    if (idx !== undefined) {
+      const w = sheet.getColumnWidth(idx + 1);
+      if (w > 400) sheet.setColumnWidth(idx + 1, 400);
+      else if (w < 180) sheet.setColumnWidth(idx + 1, 180);
+    }
+  }
+
+  const bandings = sheet.getBandings();
+  if (!bandings || bandings.length === 0) {
+    try {
+      sheet
+        .getRange(1, 1, maxRows, lastCol)
+        .applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, true, false);
+    } catch (err) {
+      /* ignore */
+    }
+  }
+}
+
+
+// ============================================================================
+// File 6 / 7  --  Email.gs
+// ============================================================================
+
+function sendReviewAlertEmail_(id, p) {
+  const stars = '★'.repeat(p.rating) + '☆'.repeat(5 - p.rating);
+  const sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  const location = [p.city, p.state].filter(Boolean).join(', ') || '';
+  const designName = composeDesignName_(p.referencedDesign);
+
+  const subject =
+    '[KK Engravings] New review: ' + p.rating + '★ from ' + p.firstName;
+
+  const htmlBody =
+    '<div style="font-family: Georgia, serif; max-width: 600px; line-height: 1.6; color: #2b2a28;">' +
+    '<h2 style="color:#5a3a1c; margin: 0 0 16px;">New review -- pending approval</h2>' +
+    '<table style="border-collapse: collapse; margin-bottom: 16px;">' +
+    emailRow_('ID', esc_(id)) +
+    emailRow_('Rating', '<span style="color:#c9a961; font-size:18px; letter-spacing:2px;">' + stars + '</span> &nbsp;(' + p.rating + '/5)') +
+    emailRow_('Reviewer', esc_(p.firstName) + (p.lastInitial ? ' ' + esc_(p.lastInitial) : '') + (location ? ' · ' + esc_(location) : '')) +
+    emailRow_('Email', esc_(p.email)) +
+    (designName ? emailRow_('Design', esc_(designName)) : '') +
+    '</table>' +
+    (p.headline ? '<h3 style="color:#5a3a1c; margin: 20px 0 6px;">' + esc_(p.headline) + '</h3>' : '') +
+    '<blockquote style="border-left: 3px solid #c9a961; padding: 4px 16px; margin: 12px 0; color: #333; background: #f7f1e7;">' +
+    esc_(p.body).replace(/\n/g, '<br>') +
+    '</blockquote>' +
+    '<hr style="border: none; border-top: 1px solid #e3d7bf; margin: 24px 0;">' +
+    '<p style="font-size: 14px; color: #666;">' +
+    '<strong>To publish:</strong><br>' +
+    '1. <a href="' + sheetUrl + '">Open the spreadsheet</a><br>' +
+    '2. Find row with ID <code>' + esc_(id) + '</code> on the <strong>Reviews</strong> tab<br>' +
+    '3. Tick the <strong>Published</strong> checkbox<br>' +
+    '4. The review will appear on the site within 5 minutes.' +
+    '</p>' +
+    '</div>';
+
+  MailApp.sendEmail({
+    to: RECIPIENT_EMAIL,
+    subject: subject,
+    htmlBody: htmlBody,
+    name: 'KK Engravings Website',
+  });
+}
+
+function emailRow_(label, valueHtml) {
+  return (
+    '<tr>' +
+    '<td style="padding: 4px 16px 4px 0; color: #666; vertical-align: top;">' + esc_(label) + '</td>' +
+    '<td style="padding: 4px 0;">' + (valueHtml || '') + '</td>' +
+    '</tr>'
+  );
+}
+
+function esc_(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+
+// ============================================================================
+// File 7 / 7  --  Testing.gs
+// ============================================================================
+
+function test_ApplyFormatting() {
+  const sheet = getSheet_(SHEET_NAMES.reviews);
+  ensureColumns_(sheet, REVIEW_COLUMNS, REVIEW_COLUMN_ALIASES);
+  applySheetFormatting_(sheet, REVIEW_COLUMNS, REVIEW_WRAPPED_COLUMNS, REVIEW_COLUMN_ALIASES);
+  Logger.log('Formatting applied to Reviews tab.');
+}
+
+function test_SubmitSampleReview() {
+  const payload = {
+    rating: 5,
+    firstName: 'Jane',
+    lastInitial: 'S.',
+    email: 'test+review@example.com',
+    city: 'Chicago',
+    state: 'IL',
+    headline: 'Beautiful work',
+    body: 'KK made us a custom bear family puzzle for our 5-year anniversary. Fast turnaround, beautiful finish, personal communication throughout.',
+    referencedDesign: 'family-plaque-design-2',
+    hp: '',
+  };
+  const resp = doPost({ postData: { contents: JSON.stringify({ type: 'review', payload: payload }) } });
+  Logger.log(resp.getContent());
+}
+
+function test_HoneypotTripped() {
+  const payload = {
+    rating: 5,
+    firstName: 'Bot',
+    email: 'bot@spam.com',
+    body: 'This submission should be silently dropped by the honeypot.',
+    hp: 'I am a bot filling every field',
+  };
+  const resp = doPost({ postData: { contents: JSON.stringify({ type: 'review', payload: payload }) } });
+  Logger.log(resp.getContent());
+}
+
+function test_InvalidPayload() {
+  const payload = { rating: 10, firstName: '', body: 'too short' };
+  const resp = doPost({ postData: { contents: JSON.stringify({ type: 'review', payload: payload }) } });
+  Logger.log(resp.getContent());
+}
+
+function test_RateLimitSecondAttempt() {
+  // Run test_SubmitSampleReview first, then this. Expected: rate-limited.
+  test_SubmitSampleReview();
+}
+
+function test_FetchReviews() {
+  const resp = doGet({ parameter: { type: 'reviews' } });
+  Logger.log(resp.getContent());
+}
+
+function test_ClearRateLimits() {
+  const props = PropertiesService.getScriptProperties();
+  const all = props.getProperties();
+  let removed = 0;
+  for (const key in all) {
+    if (key.indexOf('rl_') === 0) {
+      props.deleteProperty(key);
+      removed++;
+    }
+  }
+  Logger.log('Cleared ' + removed + ' rate-limit entries.');
+}
+
+
+// ============================================================================
+// appsscript.json manifest (paste in Project Settings -> "Show appsscript.json"):
+// ----------------------------------------------------------------------------
+// {
+//   "timeZone": "America/Chicago",
+//   "dependencies": {},
+//   "exceptionLogging": "STACKDRIVER",
+//   "runtimeVersion": "V8",
+//   "oauthScopes": [
+//     "https://www.googleapis.com/auth/spreadsheets.currentonly",
+//     "https://www.googleapis.com/auth/script.send_mail",
+//     "https://www.googleapis.com/auth/script.scriptapp"
+//   ]
+// }
+// ============================================================================
+
+
+// ============================================================================
+// File 8 / 10  --  Orders.gs (ACTIVE)
+// ============================================================================
+
+function handleOrderSubmission_(payload) {
+  const idempotencyKey = String((payload && payload.idempotencyKey) || '');
+  const validation = validateOrder_(payload || {});
+  if (validation.errors && validation.errors.length > 0) {
+    return jsonResponse_({ ok: false, reason: 'invalid', details: validation.errors });
+  }
+  const p = validation.sanitized;
+
+  // 1) Idempotency: same submission key seen in last 10 min → return cached result.
+  const idem = checkIdempotency_('ord', idempotencyKey);
+  if (idem.seen) {
+    return jsonResponse_({ ok: true, id: idem.id, emailStatus: idem.emailStatus, idempotent: true });
+  }
+  // 2) Content dedup: same content in last 60s → return existing ID (safety net
+  //    for double-clicks from an older bundle that didn't send a key).
+  const contentHash = orderContentHash_(p);
+  const cdh = checkContentDedup_('ord', contentHash);
+  if (cdh.seen) {
+    return jsonResponse_({ ok: true, id: cdh.id, emailStatus: cdh.emailStatus, idempotent: true });
+  }
+
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(LIMITS.lockTimeoutMs);
+  let id;
+  try {
+    const sheet = getSheet_(SHEET_NAMES.orders);
+    ensureColumns_(sheet, ORDER_COLUMNS, ORDER_COLUMN_ALIASES);
+    const colMap = readHeaderMap_(sheet, ORDER_COLUMN_ALIASES);
+    id = generateIdWithinLock_(sheet, colMap, ORDER_ID_PREFIX);
+    const row = buildOrderRow_(id, p, colMap);
+    sheet.appendRow(row);
+  } finally {
+    lock.releaseLock();
+  }
+
+  try {
+    applySheetFormatting_(
+      getSheet_(SHEET_NAMES.orders),
+      ORDER_COLUMNS,
+      ORDER_WRAPPED_COLUMNS,
+      ORDER_COLUMN_ALIASES
+    );
+  } catch (err) {
+    console.warn('[KK] orders formatting skipped:', err && err.message);
+  }
+
+  let emailStatus;
+  try {
+    sendOrderAlertEmail_(id, p);
+    emailStatus = 'sent';
+  } catch (err) {
+    emailStatus = 'failed: ' + ((err && err.message) || 'unknown');
+    console.error('[KK] order email send failed for', id, err);
+  }
+  console.log('[KK] order', id, 'email:', emailStatus);
+
+  // Record idempotency + content hash so retries/double-clicks get the same id.
+  recordIdempotency_('ord', idempotencyKey, id, emailStatus);
+  recordContentDedup_('ord', contentHash, id, emailStatus);
+
+  return jsonResponse_({ ok: true, id: id, emailStatus: emailStatus });
+}
+
+function validateOrder_(p) {
+  const errors = [];
+  if (!p.fullName || String(p.fullName).trim().length < 1) errors.push('missing-name');
+  if (!isEmail_(p.email)) errors.push('invalid-email');
+  if (!p.phone || String(p.phone).replace(/\D/g, '').length < 7) errors.push('invalid-phone');
+  if (!p.line1 || String(p.line1).trim().length < 3) errors.push('missing-address');
+  if (!p.city || String(p.city).trim().length < 1) errors.push('missing-city');
+  if (!p.state || String(p.state).trim().length < 1) errors.push('missing-state');
+  if (!p.postalCode || String(p.postalCode).trim().length < 3) errors.push('missing-zip');
+  if (!Array.isArray(p.items) || p.items.length === 0) errors.push('empty-cart');
+  if (errors.length > 0) return { errors: errors, sanitized: null };
+  return {
+    errors: [],
+    sanitized: {
+      fullName: sanitize_(p.fullName, 120),
+      email: sanitize_(p.email, LIMITS.emailMax).toLowerCase(),
+      phone: sanitize_(p.phone, 30),
+      line1: sanitize_(p.line1, 160),
+      line2: sanitize_(p.line2, 160),
+      city: sanitize_(p.city, 80),
+      state: sanitize_(p.state, 30),
+      postalCode: sanitize_(p.postalCode, 20),
+      country: sanitize_(p.country, 30) || 'US',
+      items: (p.items || []).map(function (it) {
+        return {
+          designTitle: sanitize_(it.designTitle, 200),
+          variantLabel: sanitize_(it.variantLabel, 200),
+          engravingText: sanitize_(it.engravingText, 2000),
+          occasionNote: sanitize_(it.occasionNote, 200),
+          quantity: Math.max(1, Math.min(99, parseInt(it.quantity, 10) || 1)),
+        };
+      }),
+    },
+  };
+}
+
+function composeCustomerLine_(fullName, email, phone) {
+  return [fullName, email, phone].filter(Boolean).join(' · ');
+}
+
+function composeShippingAddress_(p) {
+  const lines = [p.line1];
+  if (p.line2) lines.push(p.line2);
+  lines.push(p.city + ', ' + p.state + ' ' + p.postalCode);
+  lines.push(p.country || 'US');
+  return lines.join('\n');
+}
+
+function composeOrderSummary_(items) {
+  return items.map(function (it, i) {
+    const header = (i + 1) + '. ' + it.quantity + '× ' + (it.designTitle || '(design)') +
+      (it.variantLabel ? ' — ' + it.variantLabel : '');
+    const engraving = it.engravingText ? '\n   Engrave: ' + it.engravingText : '';
+    const occasion = it.occasionNote ? '\n   Occasion: ' + it.occasionNote : '';
+    return header + engraving + occasion;
+  }).join('\n\n');
+}
+
+function buildOrderRow_(id, p, colMap) {
+  let width = 0;
+  for (const k in colMap) if (colMap[k] + 1 > width) width = colMap[k] + 1;
+  const row = new Array(width).fill('');
+  const put = function (name, value) {
+    const i = colMap[name];
+    if (i !== undefined) row[i] = value;
+  };
+  put('Timestamp', new Date());
+  put('ID', id);
+  put('Customer', composeCustomerLine_(p.fullName, p.email, p.phone));
+  put('Shipping to', composeShippingAddress_(p));
+  put('Order', composeOrderSummary_(p.items));
+  put('Status', 'NEW');
+  return row;
+}
+
+function sendOrderAlertEmail_(id, p) {
+  const sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  const totalItems = p.items.reduce(function (n, it) { return n + it.quantity; }, 0);
+  const subject = '[KK Engravings] New order ' + id + ' — ' + totalItems + ' item' + (totalItems === 1 ? '' : 's');
+
+  const itemsHtml = p.items.map(function (it) {
+    return '<li style="margin-bottom:10px;">' +
+      '<strong>' + it.quantity + '× ' + esc_(it.designTitle || '(design)') + '</strong>' +
+      (it.variantLabel ? ' — ' + esc_(it.variantLabel) : '') +
+      (it.engravingText ? '<br><em>Engrave:</em> ' + esc_(it.engravingText).replace(/\n/g, '<br>') : '') +
+      (it.occasionNote ? '<br><em>Occasion:</em> ' + esc_(it.occasionNote) : '') +
+    '</li>';
+  }).join('');
+
+  const htmlBody =
+    '<div style="font-family: Georgia, serif; max-width: 640px; line-height: 1.6; color: #2b2a28;">' +
+    '<h2 style="color:#5a3a1c; margin: 0 0 16px;">New order — ' + esc_(id) + '</h2>' +
+    '<table style="border-collapse: collapse; margin-bottom: 16px;">' +
+    emailRow_('Customer', esc_(p.fullName)) +
+    emailRow_('Email', esc_(p.email)) +
+    emailRow_('Phone', esc_(p.phone)) +
+    emailRow_('Shipping to', esc_(composeShippingAddress_(p)).replace(/\n/g, '<br>')) +
+    '</table>' +
+    '<h3 style="color:#5a3a1c; margin: 20px 0 6px;">Items (' + totalItems + ')</h3>' +
+    '<ul style="padding-left: 20px;">' + itemsHtml + '</ul>' +
+    '<hr style="border: none; border-top: 1px solid #e3d7bf; margin: 24px 0;">' +
+    '<p style="font-size: 14px; color: #666;">' +
+    '<a href="' + sheetUrl + '">Open spreadsheet</a> — reply to confirm pricing, shipping, and payment.' +
+    '</p>' +
+    '</div>';
+
+  MailApp.sendEmail({
+    to: RECIPIENT_EMAIL,
+    subject: subject,
+    htmlBody: htmlBody,
+    name: 'KK Engravings Website',
+    replyTo: p.email,
+  });
+}
+
+
+// ============================================================================
+// File 9 / 10  --  Custom.gs (ACTIVE)
+// ============================================================================
+
+function handleCustomSubmission_(payload) {
+  const idempotencyKey = String((payload && payload.idempotencyKey) || '');
+  const validation = validateCustom_(payload || {});
+  if (validation.errors && validation.errors.length > 0) {
+    return jsonResponse_({ ok: false, reason: 'invalid', details: validation.errors });
+  }
+  const p = validation.sanitized;
+
+  const idem = checkIdempotency_('cus', idempotencyKey);
+  if (idem.seen) {
+    return jsonResponse_({ ok: true, id: idem.id, emailStatus: idem.emailStatus, idempotent: true });
+  }
+  const contentHash = customContentHash_(p);
+  const cdh = checkContentDedup_('cus', contentHash);
+  if (cdh.seen) {
+    return jsonResponse_({ ok: true, id: cdh.id, emailStatus: cdh.emailStatus, idempotent: true });
+  }
+
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(LIMITS.lockTimeoutMs);
+  let id;
+  try {
+    const sheet = getSheet_(SHEET_NAMES.custom);
+    ensureColumns_(sheet, CUSTOM_COLUMNS, CUSTOM_COLUMN_ALIASES);
+    const colMap = readHeaderMap_(sheet, CUSTOM_COLUMN_ALIASES);
+    id = generateIdWithinLock_(sheet, colMap, CUSTOM_ID_PREFIX);
+    const row = buildCustomRow_(id, p, colMap);
+    sheet.appendRow(row);
+  } finally {
+    lock.releaseLock();
+  }
+
+  try {
+    applySheetFormatting_(
+      getSheet_(SHEET_NAMES.custom),
+      CUSTOM_COLUMNS,
+      CUSTOM_WRAPPED_COLUMNS,
+      CUSTOM_COLUMN_ALIASES
+    );
+  } catch (err) {
+    console.warn('[KK] custom formatting skipped:', err && err.message);
+  }
+
+  let emailStatus;
+  try {
+    sendCustomAlertEmail_(id, p);
+    emailStatus = 'sent';
+  } catch (err) {
+    emailStatus = 'failed: ' + ((err && err.message) || 'unknown');
+    console.error('[KK] custom email send failed for', id, err);
+  }
+  console.log('[KK] custom', id, 'email:', emailStatus);
+
+  recordIdempotency_('cus', idempotencyKey, id, emailStatus);
+  recordContentDedup_('cus', contentHash, id, emailStatus);
+
+  return jsonResponse_({ ok: true, id: id, emailStatus: emailStatus });
+}
+
+function validateCustom_(p) {
+  const errors = [];
+  if (!p.fullName || String(p.fullName).trim().length < 1) errors.push('missing-name');
+  if (!isEmail_(p.email)) errors.push('invalid-email');
+  const idea = sanitize_(p.idea, 3000);
+  if (idea.length < 10) errors.push('idea-too-short');
+  if (errors.length > 0) return { errors: errors, sanitized: null };
+  return {
+    errors: [],
+    sanitized: {
+      fullName: sanitize_(p.fullName, 120),
+      email: sanitize_(p.email, LIMITS.emailMax).toLowerCase(),
+      phone: sanitize_(p.phone, 30),
+      occasion: sanitize_(p.occasion, 200),
+      idea: idea,
+      references: Array.isArray(p.references) ? p.references.map(function (r) {
+        return { title: sanitize_(r.title, 200), imageFull: sanitize_(r.imageFull, 500) };
+      }).slice(0, 15) : [],
+    },
+  };
+}
+
+function composeCustomRequest_(p) {
+  let out = p.idea;
+  if (p.references && p.references.length > 0) {
+    out += '\n\nGallery references (' + p.references.length + '):';
+    p.references.forEach(function (r, i) {
+      out += '\n' + (i + 1) + '. ' + r.title;
+      if (r.imageFull) out += '\n   ' + r.imageFull;
+    });
+  }
+  return out;
+}
+
+function buildCustomRow_(id, p, colMap) {
+  let width = 0;
+  for (const k in colMap) if (colMap[k] + 1 > width) width = colMap[k] + 1;
+  const row = new Array(width).fill('');
+  const put = function (name, value) {
+    const i = colMap[name];
+    if (i !== undefined) row[i] = value;
+  };
+  put('Timestamp', new Date());
+  put('ID', id);
+  put('Customer', composeCustomerLine_(p.fullName, p.email, p.phone));
+  put('Occasion', p.occasion);
+  put('Request', composeCustomRequest_(p));
+  put('Status', 'NEW');
+  return row;
+}
+
+function sendCustomAlertEmail_(id, p) {
+  const sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  const subject = '[KK Engravings] Custom request ' + id + ' from ' + p.fullName;
+
+  const refsHtml = (p.references && p.references.length > 0)
+    ? '<h3 style="color:#5a3a1c; margin: 20px 0 6px;">Gallery references (' + p.references.length + ')</h3>' +
+      '<ul style="padding-left: 20px;">' +
+      p.references.map(function (r) {
+        return '<li><strong>' + esc_(r.title) + '</strong>' +
+          (r.imageFull ? '<br><a href="' + esc_(r.imageFull) + '">' + esc_(r.imageFull) + '</a>' : '') +
+          '</li>';
+      }).join('') + '</ul>'
+    : '';
+
+  const htmlBody =
+    '<div style="font-family: Georgia, serif; max-width: 640px; line-height: 1.6; color: #2b2a28;">' +
+    '<h2 style="color:#5a3a1c; margin: 0 0 16px;">Custom request — ' + esc_(id) + '</h2>' +
+    '<table style="border-collapse: collapse; margin-bottom: 16px;">' +
+    emailRow_('Customer', esc_(p.fullName)) +
+    emailRow_('Email', esc_(p.email)) +
+    (p.phone ? emailRow_('Phone', esc_(p.phone)) : '') +
+    (p.occasion ? emailRow_('Occasion', esc_(p.occasion)) : '') +
+    '</table>' +
+    '<h3 style="color:#5a3a1c; margin: 20px 0 6px;">Idea</h3>' +
+    '<blockquote style="border-left: 3px solid #c9a961; padding: 4px 16px; margin: 12px 0; color: #333; background: #f7f1e7;">' +
+    esc_(p.idea).replace(/\n/g, '<br>') +
+    '</blockquote>' +
+    refsHtml +
+    '<hr style="border: none; border-top: 1px solid #e3d7bf; margin: 24px 0;">' +
+    '<p style="font-size: 14px; color: #666;">' +
+    '<a href="' + sheetUrl + '">Open spreadsheet</a> — reply to send a quote.' +
+    '</p>' +
+    '</div>';
+
+  MailApp.sendEmail({
+    to: RECIPIENT_EMAIL,
+    subject: subject,
+    htmlBody: htmlBody,
+    name: 'KK Engravings Website',
+    replyTo: p.email,
+  });
+}
+

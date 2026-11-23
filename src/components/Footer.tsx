@@ -1,11 +1,12 @@
 import { site } from "../data/site.config";
 
 const LINKS = [
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "gallery", label: "Gallery" },
-  { id: "custom", label: "Custom" },
-  { id: "contact", label: "Contact" },
+  { href: "#home", label: "Home" },
+  { href: "#/orders", label: "Shop" },
+  { href: "#about", label: "About" },
+  { href: "#gallery", label: "Gallery" },
+  { href: "#/reviews", label: "Reviews" },
+  { href: "#contact", label: "Contact" },
 ];
 
 export function Footer() {
@@ -27,9 +28,9 @@ export function Footer() {
           <p className="text-xs uppercase tracking-[0.22em] text-[var(--color-gold-soft)] mb-4">Explore</p>
           <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
             {LINKS.map((l) => (
-              <li key={l.id}>
+              <li key={l.href}>
                 <a
-                  href={`#${l.id}`}
+                  href={l.href}
                   className="text-[var(--color-ivory)]/80 hover:text-[var(--color-ivory)] transition-colors"
                 >
                   {l.label}

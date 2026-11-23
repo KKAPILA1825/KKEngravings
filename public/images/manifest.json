@@ -24,22 +24,6 @@
     "height": 2845
   },
   {
-    "source": "20251008_092348.jpg",
-    "slug": "20251008-092348",
-    "thumb": "/images/20251008-092348.thumb.webp",
-    "full": "/images/20251008-092348.webp",
-    "width": 1600,
-    "height": 3730
-  },
-  {
-    "source": "20251008_092421.jpg",
-    "slug": "20251008-092421",
-    "thumb": "/images/20251008-092421.thumb.webp",
-    "full": "/images/20251008-092421.webp",
-    "width": 1600,
-    "height": 3730
-  },
-  {
     "source": "IMG-20250808-WA0004.jpg",
     "slug": "img-20250808-wa0004",
     "thumb": "/images/img-20250808-wa0004.thumb.webp",
@@ -72,14 +56,6 @@
     "height": 2048
   },
   {
-    "source": "IMG-20251130-WA0009.jpg",
-    "slug": "img-20251130-wa0009",
-    "thumb": "/images/img-20251130-wa0009.thumb.webp",
-    "full": "/images/img-20251130-wa0009.webp",
-    "width": 1536,
-    "height": 2040
-  },
-  {
     "source": "IMG_1166.CR3.jpg",
     "slug": "img-1166-cr3",
     "thumb": "/images/img-1166-cr3.thumb.webp",
@@ -104,14 +80,6 @@
     "height": 2400
   },
   {
-    "source": "IMG_1341.JPG",
-    "slug": "img-1341",
-    "thumb": "/images/img-1341.thumb.webp",
-    "full": "/images/img-1341.webp",
-    "width": 1600,
-    "height": 2400
-  },
-  {
     "source": "Keychain.jpg",
     "slug": "keychain",
     "thumb": "/images/keychain.thumb.webp",
@@ -128,68 +96,12 @@
     "height": 1066
   },
   {
-    "source": "one.jpg",
-    "slug": "one",
-    "thumb": "/images/one.thumb.webp",
-    "full": "/images/one.webp",
-    "width": 1184,
-    "height": 1516
-  },
-  {
-    "source": "original_21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55_PXL_20260126_225639459.NIGHT.jpg",
-    "slug": "original-21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55-pxl-20260126-225639459-night",
-    "thumb": "/images/original-21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55-pxl-20260126-225639459-night.thumb.webp",
-    "full": "/images/original-21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55-pxl-20260126-225639459-night.webp",
-    "width": 1600,
-    "height": 1198
-  },
-  {
     "source": "original_388b8154-8aed-4270-b402-270a03d2e0ca_PXL_20251217_033112575.jpg",
     "slug": "original-388b8154-8aed-4270-b402-270a03d2e0ca-pxl-20251217-033112575",
     "thumb": "/images/original-388b8154-8aed-4270-b402-270a03d2e0ca-pxl-20251217-033112575.thumb.webp",
     "full": "/images/original-388b8154-8aed-4270-b402-270a03d2e0ca-pxl-20251217-033112575.webp",
     "width": 1600,
     "height": 917
-  },
-  {
-    "source": "PXL_20240618_194557596.jpg",
-    "slug": "pxl-20240618-194557596",
-    "thumb": "/images/pxl-20240618-194557596.thumb.webp",
-    "full": "/images/pxl-20240618-194557596.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20240705_235513124.jpg",
-    "slug": "pxl-20240705-235513124",
-    "thumb": "/images/pxl-20240705-235513124.thumb.webp",
-    "full": "/images/pxl-20240705-235513124.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20240723_215743241.MP.jpg",
-    "slug": "pxl-20240723-215743241-mp",
-    "thumb": "/images/pxl-20240723-215743241-mp.thumb.webp",
-    "full": "/images/pxl-20240723-215743241-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20240723_215800447.MP.jpg",
-    "slug": "pxl-20240723-215800447-mp",
-    "thumb": "/images/pxl-20240723-215800447-mp.thumb.webp",
-    "full": "/images/pxl-20240723-215800447-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20240727_001158286.jpg",
-    "slug": "pxl-20240727-001158286",
-    "thumb": "/images/pxl-20240727-001158286.thumb.webp",
-    "full": "/images/pxl-20240727-001158286.webp",
-    "width": 1600,
-    "height": 2844
   },
   {
     "source": "PXL_20240727_001158968.jpg",
@@ -200,44 +112,12 @@
     "height": 2844
   },
   {
-    "source": "PXL_20240824_182850731.jpg",
-    "slug": "pxl-20240824-182850731",
-    "thumb": "/images/pxl-20240824-182850731.thumb.webp",
-    "full": "/images/pxl-20240824-182850731.webp",
-    "width": 1600,
-    "height": 1028
-  },
-  {
     "source": "PXL_20240902_235109034.MP.jpg",
     "slug": "pxl-20240902-235109034-mp",
     "thumb": "/images/pxl-20240902-235109034-mp.thumb.webp",
     "full": "/images/pxl-20240902-235109034-mp.webp",
     "width": 1600,
     "height": 900
-  },
-  {
-    "source": "PXL_20240902_235129690.jpg",
-    "slug": "pxl-20240902-235129690",
-    "thumb": "/images/pxl-20240902-235129690.thumb.webp",
-    "full": "/images/pxl-20240902-235129690.webp",
-    "width": 1600,
-    "height": 900
-  },
-  {
-    "source": "PXL_20241219_044209400.PORTRAIT.jpg",
-    "slug": "pxl-20241219-044209400-portrait",
-    "thumb": "/images/pxl-20241219-044209400-portrait.thumb.webp",
-    "full": "/images/pxl-20241219-044209400-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "source": "PXL_20241219_214447775.jpg",
-    "slug": "pxl-20241219-214447775",
-    "thumb": "/images/pxl-20241219-214447775.thumb.webp",
-    "full": "/images/pxl-20241219-214447775.webp",
-    "width": 1600,
-    "height": 2844
   },
   {
     "source": "PXL_20241219_214457372.jpg",
@@ -248,90 +128,10 @@
     "height": 2844
   },
   {
-    "source": "PXL_20241220_194630937.MP.jpg",
-    "slug": "pxl-20241220-194630937-mp",
-    "thumb": "/images/pxl-20241220-194630937-mp.thumb.webp",
-    "full": "/images/pxl-20241220-194630937-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20241220_194910438.MP.jpg",
-    "slug": "pxl-20241220-194910438-mp",
-    "thumb": "/images/pxl-20241220-194910438-mp.thumb.webp",
-    "full": "/images/pxl-20241220-194910438-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20241220_195040934.MP.jpg",
-    "slug": "pxl-20241220-195040934-mp",
-    "thumb": "/images/pxl-20241220-195040934-mp.thumb.webp",
-    "full": "/images/pxl-20241220-195040934-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20241220_202205469.MP~3.jpg",
-    "slug": "pxl-20241220-202205469-mp-3",
-    "thumb": "/images/pxl-20241220-202205469-mp-3.thumb.webp",
-    "full": "/images/pxl-20241220-202205469-mp-3.webp",
-    "width": 1600,
-    "height": 825
-  },
-  {
-    "source": "PXL_20241220_205745032.MP~3.jpg",
-    "slug": "pxl-20241220-205745032-mp-3",
-    "thumb": "/images/pxl-20241220-205745032-mp-3.thumb.webp",
-    "full": "/images/pxl-20241220-205745032-mp-3.webp",
-    "width": 1600,
-    "height": 592
-  },
-  {
     "source": "PXL_20250204_135314324.MP.jpg",
     "slug": "pxl-20250204-135314324-mp",
     "thumb": "/images/pxl-20250204-135314324-mp.thumb.webp",
     "full": "/images/pxl-20250204-135314324-mp.webp",
-    "width": 1600,
-    "height": 902
-  },
-  {
-    "source": "PXL_20250210_022033451.MP~2.jpg",
-    "slug": "pxl-20250210-022033451-mp-2",
-    "thumb": "/images/pxl-20250210-022033451-mp-2.thumb.webp",
-    "full": "/images/pxl-20250210-022033451-mp-2.webp",
-    "width": 1600,
-    "height": 1092
-  },
-  {
-    "source": "PXL_20250210_215749706.MP~3.jpg",
-    "slug": "pxl-20250210-215749706-mp-3",
-    "thumb": "/images/pxl-20250210-215749706-mp-3.thumb.webp",
-    "full": "/images/pxl-20250210-215749706-mp-3.webp",
-    "width": 1600,
-    "height": 2433
-  },
-  {
-    "source": "PXL_20250321_021323243.jpg",
-    "slug": "pxl-20250321-021323243",
-    "thumb": "/images/pxl-20250321-021323243.thumb.webp",
-    "full": "/images/pxl-20250321-021323243.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20250405_060234114.jpg",
-    "slug": "pxl-20250405-060234114",
-    "thumb": "/images/pxl-20250405-060234114.thumb.webp",
-    "full": "/images/pxl-20250405-060234114.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "source": "PXL_20250405_060244840.jpg",
-    "slug": "pxl-20250405-060244840",
-    "thumb": "/images/pxl-20250405-060244840.thumb.webp",
-    "full": "/images/pxl-20250405-060244840.webp",
     "width": 1600,
     "height": 902
   },
@@ -352,34 +152,10 @@
     "height": 900
   },
   {
-    "source": "PXL_20250412_133044961.PORTRAIT.ORIGINAL.jpg",
-    "slug": "pxl-20250412-133044961-portrait-original",
-    "thumb": "/images/pxl-20250412-133044961-portrait-original.thumb.webp",
-    "full": "/images/pxl-20250412-133044961-portrait-original.webp",
-    "width": 1600,
-    "height": 900
-  },
-  {
     "source": "PXL_20250412_133202408.PORTRAIT.ORIGINAL.jpg",
     "slug": "pxl-20250412-133202408-portrait-original",
     "thumb": "/images/pxl-20250412-133202408-portrait-original.thumb.webp",
     "full": "/images/pxl-20250412-133202408-portrait-original.webp",
-    "width": 1600,
-    "height": 900
-  },
-  {
-    "source": "PXL_20250419_014533954.PORTRAIT.jpg",
-    "slug": "pxl-20250419-014533954-portrait",
-    "thumb": "/images/pxl-20250419-014533954-portrait.thumb.webp",
-    "full": "/images/pxl-20250419-014533954-portrait.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "source": "PXL_20250419_015305351.MP.jpg",
-    "slug": "pxl-20250419-015305351-mp",
-    "thumb": "/images/pxl-20250419-015305351-mp.thumb.webp",
-    "full": "/images/pxl-20250419-015305351-mp.webp",
     "width": 1600,
     "height": 900
   },
@@ -400,28 +176,12 @@
     "height": 900
   },
   {
-    "source": "PXL_20250426_200623528.jpg",
-    "slug": "pxl-20250426-200623528",
-    "thumb": "/images/pxl-20250426-200623528.thumb.webp",
-    "full": "/images/pxl-20250426-200623528.webp",
-    "width": 1600,
-    "height": 900
-  },
-  {
     "source": "PXL_20250504_013201633.PORTRAIT~2.jpg",
     "slug": "pxl-20250504-013201633-portrait-2",
     "thumb": "/images/pxl-20250504-013201633-portrait-2.thumb.webp",
     "full": "/images/pxl-20250504-013201633-portrait-2.webp",
     "width": 1197,
     "height": 1929
-  },
-  {
-    "source": "PXL_20250928_151402794.jpg",
-    "slug": "pxl-20250928-151402794",
-    "thumb": "/images/pxl-20250928-151402794.thumb.webp",
-    "full": "/images/pxl-20250928-151402794.webp",
-    "width": 1600,
-    "height": 406
   },
   {
     "source": "PXL_20251101_222606965.PORTRAIT.jpg",
@@ -448,36 +208,12 @@
     "height": 902
   },
   {
-    "source": "PXL_20251206_185854801~3.jpg",
-    "slug": "pxl-20251206-185854801-3",
-    "thumb": "/images/pxl-20251206-185854801-3.thumb.webp",
-    "full": "/images/pxl-20251206-185854801-3.webp",
-    "width": 1600,
-    "height": 2007
-  },
-  {
-    "source": "PXL_20251206_192152250.PORTRAIT.ORIGINAL.jpg",
-    "slug": "pxl-20251206-192152250-portrait-original",
-    "thumb": "/images/pxl-20251206-192152250-portrait-original.thumb.webp",
-    "full": "/images/pxl-20251206-192152250-portrait-original.webp",
-    "width": 1600,
-    "height": 1205
-  },
-  {
     "source": "PXL_20251206_192331330.PORTRAIT.ORIGINAL.jpg",
     "slug": "pxl-20251206-192331330-portrait-original",
     "thumb": "/images/pxl-20251206-192331330-portrait-original.thumb.webp",
     "full": "/images/pxl-20251206-192331330-portrait-original.webp",
     "width": 1600,
     "height": 1887
-  },
-  {
-    "source": "PXL_20251214_014445258.jpg",
-    "slug": "pxl-20251214-014445258",
-    "thumb": "/images/pxl-20251214-014445258.thumb.webp",
-    "full": "/images/pxl-20251214-014445258.webp",
-    "width": 1600,
-    "height": 1601
   },
   {
     "source": "PXL_20251216_000312017~2.jpg",
@@ -488,52 +224,12 @@
     "height": 1091
   },
   {
-    "source": "PXL_20251219_125918327.jpg",
-    "slug": "pxl-20251219-125918327",
-    "thumb": "/images/pxl-20251219-125918327.thumb.webp",
-    "full": "/images/pxl-20251219-125918327.webp",
-    "width": 1600,
-    "height": 1482
-  },
-  {
     "source": "PXL_20251219_130153169~2.jpg",
     "slug": "pxl-20251219-130153169-2",
     "thumb": "/images/pxl-20251219-130153169-2.thumb.webp",
     "full": "/images/pxl-20251219-130153169-2.webp",
     "width": 1600,
     "height": 1099
-  },
-  {
-    "source": "PXL_20251219_130212788.jpg",
-    "slug": "pxl-20251219-130212788",
-    "thumb": "/images/pxl-20251219-130212788.thumb.webp",
-    "full": "/images/pxl-20251219-130212788.webp",
-    "width": 1600,
-    "height": 1017
-  },
-  {
-    "source": "PXL_20251219_130236511.jpg",
-    "slug": "pxl-20251219-130236511",
-    "thumb": "/images/pxl-20251219-130236511.thumb.webp",
-    "full": "/images/pxl-20251219-130236511.webp",
-    "width": 1600,
-    "height": 1056
-  },
-  {
-    "source": "PXL_20251219_130554466~2.jpg",
-    "slug": "pxl-20251219-130554466-2",
-    "thumb": "/images/pxl-20251219-130554466-2.thumb.webp",
-    "full": "/images/pxl-20251219-130554466-2.webp",
-    "width": 1600,
-    "height": 1291
-  },
-  {
-    "source": "PXL_20251219_130639148~2.jpg",
-    "slug": "pxl-20251219-130639148-2",
-    "thumb": "/images/pxl-20251219-130639148-2.thumb.webp",
-    "full": "/images/pxl-20251219-130639148-2.webp",
-    "width": 1600,
-    "height": 782
   },
   {
     "source": "PXL_20251219_131635184~2.jpg",
@@ -552,68 +248,12 @@
     "height": 2125
   },
   {
-    "source": "PXL_20260218_133551672.jpg",
-    "slug": "pxl-20260218-133551672",
-    "thumb": "/images/pxl-20260218-133551672.thumb.webp",
-    "full": "/images/pxl-20260218-133551672.webp",
-    "width": 1600,
-    "height": 1205
-  },
-  {
-    "source": "PXL_20261018_143138737.MP.jpg",
-    "slug": "pxl-20261018-143138737-mp",
-    "thumb": "/images/pxl-20261018-143138737-mp.thumb.webp",
-    "full": "/images/pxl-20261018-143138737-mp.webp",
-    "width": 1600,
-    "height": 902
-  },
-  {
     "source": "PXL_20261018_143200900.PORTRAIT.jpg",
     "slug": "pxl-20261018-143200900-portrait",
     "thumb": "/images/pxl-20261018-143200900-portrait.thumb.webp",
     "full": "/images/pxl-20261018-143200900-portrait.webp",
     "width": 1600,
     "height": 2837
-  },
-  {
-    "source": "PXL_20261018_143207001.PORTRAIT.jpg",
-    "slug": "pxl-20261018-143207001-portrait",
-    "thumb": "/images/pxl-20261018-143207001-portrait.thumb.webp",
-    "full": "/images/pxl-20261018-143207001-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "source": "PXL_20261018_143229419.PORTRAIT.jpg",
-    "slug": "pxl-20261018-143229419-portrait",
-    "thumb": "/images/pxl-20261018-143229419-portrait.thumb.webp",
-    "full": "/images/pxl-20261018-143229419-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "source": "PXL_20261018_143307446.PORTRAIT.jpg",
-    "slug": "pxl-20261018-143307446-portrait",
-    "thumb": "/images/pxl-20261018-143307446-portrait.thumb.webp",
-    "full": "/images/pxl-20261018-143307446-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "source": "Screenshot_20250209-215032~2.png",
-    "slug": "screenshot-20250209-215032-2",
-    "thumb": "/images/screenshot-20250209-215032-2.thumb.webp",
-    "full": "/images/screenshot-20250209-215032-2.webp",
-    "width": 1008,
-    "height": 1202
-  },
-  {
-    "source": "Screenshot_20250217-125534~2.png",
-    "slug": "screenshot-20250217-125534-2",
-    "thumb": "/images/screenshot-20250217-125534-2.thumb.webp",
-    "full": "/images/screenshot-20250217-125534-2.webp",
-    "width": 1008,
-    "height": 1105
   },
   {
     "source": "Screenshot_20250217-130945.png",
@@ -624,44 +264,12 @@
     "height": 508
   },
   {
-    "source": "Screenshot_20250218-210442.png",
-    "slug": "screenshot-20250218-210442",
-    "thumb": "/images/screenshot-20250218-210442.thumb.webp",
-    "full": "/images/screenshot-20250218-210442.webp",
-    "width": 876,
-    "height": 853
-  },
-  {
-    "source": "Screenshot_20250218-210523.png",
-    "slug": "screenshot-20250218-210523",
-    "thumb": "/images/screenshot-20250218-210523.thumb.webp",
-    "full": "/images/screenshot-20250218-210523.webp",
-    "width": 737,
-    "height": 711
-  },
-  {
     "source": "Screenshot_20250218-212339.png",
     "slug": "screenshot-20250218-212339",
     "thumb": "/images/screenshot-20250218-212339.thumb.webp",
     "full": "/images/screenshot-20250218-212339.webp",
     "width": 1007,
     "height": 739
-  },
-  {
-    "source": "Screenshot_20250218-212455.png",
-    "slug": "screenshot-20250218-212455",
-    "thumb": "/images/screenshot-20250218-212455.thumb.webp",
-    "full": "/images/screenshot-20250218-212455.webp",
-    "width": 948,
-    "height": 620
-  },
-  {
-    "source": "Screenshot_20250218-212655.png",
-    "slug": "screenshot-20250218-212655",
-    "thumb": "/images/screenshot-20250218-212655.thumb.webp",
-    "full": "/images/screenshot-20250218-212655.webp",
-    "width": 738,
-    "height": 736
   },
   {
     "source": "WhatsApp Image 2026-11-20 at 1.14.19 PM.jpeg",

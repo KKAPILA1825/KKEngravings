@@ -77,33 +77,63 @@ export function openOrderMailto(
   window.location.href = buildMailtoHref(to, items, ship);
 }
 
-// Submits to Netlify Forms. Works only on the deployed Netlify site; locally
-// the POST will typically fail. Callers should handle rejection and surface a
-// mailto fallback.
-export async function submitOrderToNetlify(
+// Submits to the Google Apps Script endpoint (VITE_REVIEWS_ENDPOINT — same URL
+// serves reviews, orders, and custom). Uses text/plain body to avoid CORS
+// preflight. Host-agnostic (works on Amplify, Netlify, localhost, etc).
+export async function submitOrderToAppsScript(
   items: readonly CartItem[],
   ship: ShippingAddress,
-): Promise<void> {
-  const { body } = buildOrderEmail(items, ship);
-  const params = new URLSearchParams();
-  params.set("form-name", "kk-engravings-order");
-  params.set("bot-field", "");
-  params.set("customer_name", ship.fullName);
-  params.set("email", ship.email);
-  params.set("phone", ship.phone);
-  params.set("address_line1", ship.line1);
-  params.set("address_line2", ship.line2);
-  params.set("city", ship.city);
-  params.set("state", ship.state);
-  params.set("zip", ship.postalCode);
-  params.set("order_details", body);
+  idempotencyKey: string,
+): Promise<{ id: string }> {
+  const endpoint = (
+    (import.meta.env?.VITE_REVIEWS_ENDPOINT as string | undefined) ?? ""
+  ).trim();
+  if (!endpoint) throw new Error("missing-endpoint");
 
-  const res = await fetch("/", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: params.toString(),
+  const resolvedItems = items.map((it) => {
+    const design = designById(it.designId);
+    const variant = variantById(it.variantId);
+    return {
+      designTitle: design?.title ?? it.designId,
+      variantLabel: variant?.label ?? it.variantId,
+      engravingText: it.customization.engravingText,
+      occasionNote: it.customization.occasionNote ?? "",
+      quantity: it.quantity,
+    };
   });
-  if (!res.ok) {
-    throw new Error(`Netlify Forms submission failed (${res.status})`);
+
+  const payload = {
+    idempotencyKey,
+    fullName: ship.fullName,
+    email: ship.email,
+    phone: ship.phone,
+    line1: ship.line1,
+    line2: ship.line2,
+    city: ship.city,
+    state: ship.state,
+    postalCode: ship.postalCode,
+    country: ship.country,
+    items: resolvedItems,
+  };
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ type: "order", payload }),
+  });
+  if (!res.ok) throw new Error(`Submission failed (${res.status})`);
+  const data = (await res.json()) as {
+    ok: boolean;
+    id?: string;
+    reason?: string;
+    details?: string[];
+  };
+  if (!data.ok) {
+    const detail =
+      data.details && data.details.length > 0
+        ? ` (${data.details.join(", ")})`
+        : "";
+    throw new Error((data.reason || "submit-failed") + detail);
   }
+  return { id: data.id || "" };
 }

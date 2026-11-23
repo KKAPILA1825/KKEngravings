@@ -1,13 +1,14 @@
 import { ArrowDown, ShoppingBag } from "lucide-react";
 import { site } from "../data/site.config";
 import { photos } from "../data/photos";
+import { HeroTrustLine } from "../modules/reviews/components";
 
-// Hero 4-pick, chosen for lighting, variety, and premium feel (see Phase 1 proposal).
+// Hero 4-pick, chosen for lighting, variety, and premium feel.
 const HERO_SLUGS = [
-  "pxl-20250210-022033451-mp-2",        // Bear family puzzle - anchor
+  "1760451020300",                       // "Appa" elephant family puzzle - anchor
   "nardo-s-coaster",                     // Marble + walnut hexagon
-  "pxl-20241220-202205469-mp-3",        // 9-piece snowflake set
-  "img-20250808-wa0004",                 // Kamakshi/Kalyani rounds
+  "pxl-20251216-000312017-2",           // 8 family-name Christmas baubles
+  "img-20250808-wa0004",                 // Kamakshi/Kalyani round signs
 ];
 
 export function Hero() {
@@ -58,6 +59,8 @@ export function Hero() {
               Shop
             </a>
           </div>
+
+          <HeroTrustLine />
 
           <div className="reveal is-visible mt-10 flex items-center gap-3 text-xs sm:text-sm text-[var(--color-charcoal-soft)]">
             <span className="h-px w-8 bg-[color-mix(in_oklab,var(--color-walnut)_40%,transparent)]" />

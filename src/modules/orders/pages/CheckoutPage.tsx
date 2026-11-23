@@ -8,7 +8,8 @@ import {
   ShippingForm,
   type ShippingErrors,
 } from "../components/ShippingForm";
-import { openOrderMailto, submitOrderToNetlify } from "../mailto";
+import { openOrderMailto, submitOrderToAppsScript } from "../mailto";
+import { ReviewPromptDialog } from "../../reviews/components";
 import { navigate, leaveOrders } from "../router";
 import { site } from "../../../data/site.config";
 
@@ -62,13 +63,36 @@ export function CheckoutPage() {
   const [errors, setErrors] = useState<ShippingErrors>({});
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+
+  // After submission success, pop the review prompt dialog after a short beat.
+  useEffect(() => {
+    if (step !== "success") {
+      setShowReviewPrompt(false);
+      return;
+    }
+    const t = window.setTimeout(() => setShowReviewPrompt(true), 900);
+    return () => window.clearTimeout(t);
+  }, [step]);
   const mountedRef = useRef(true);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // Reset on (re-)mount so React StrictMode's double-mount in dev doesn't
+    // leave the ref stuck at false after the discarded first cleanup.
+    mountedRef.current = true;
+    return () => {
       mountedRef.current = false;
-    },
-    [],
-  );
+    };
+  }, []);
+
+  // One idempotency key per checkout mount — server dedups retries silently
+  // so double-clicks or Try-again never create a second order row.
+  const idempotencyKeyRef = useRef<string>("");
+  if (idempotencyKeyRef.current === "") {
+    idempotencyKeyRef.current =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `ord_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+  }
 
   if (cart.items.length === 0 && step !== "success") {
     return (
@@ -96,12 +120,12 @@ export function CheckoutPage() {
     setSending(true);
     setSendError(null);
     try {
-      await submitOrderToNetlify(cart.items, shipping);
+      await submitOrderToAppsScript(cart.items, shipping, idempotencyKeyRef.current);
       if (!mountedRef.current) return;
       clearCart();
       setStep("success");
     } catch (err) {
-      console.warn("[KK Orders] Netlify Forms submission failed:", err);
+      console.warn("[KK Orders] Apps Script submission failed:", err);
       if (!mountedRef.current) return;
       setSendError(
         err instanceof Error ? err.message : "Could not reach our server.",
@@ -322,6 +346,11 @@ export function CheckoutPage() {
           </div>
         </div>
       )}
+
+      <ReviewPromptDialog
+        open={showReviewPrompt}
+        onClose={() => setShowReviewPrompt(false)}
+      />
     </div>
   );
 }

@@ -14,66 +14,6 @@ export const photos: readonly Photo[] = [
     "height": 1152
   },
   {
-    "slug": "20251008-092348",
-    "title": "Bear Family Puzzle · Pavan, Elly, Nora, Isabel & Rocket",
-    "category": "Family Keepsakes",
-    "alt": "Framed wooden bear family puzzle with a red heart, engraved with the names Pavan, Elly, Nora, Isabel, and Rocket, propped outdoors against a brick wall.",
-    "thumb": "/images/20251008-092348.thumb.webp",
-    "full": "/images/20251008-092348.webp",
-    "width": 1600,
-    "height": 3730
-  },
-  {
-    "slug": "20251008-092421",
-    "title": "Bear Family Puzzle · Sara, Kiran, Rahm & Alon",
-    "category": "Family Keepsakes",
-    "alt": "Framed wooden bear family puzzle with a red heart, engraved with the names Sara, Kiran, Rahm, and Alon, displayed outdoors against a wood post.",
-    "thumb": "/images/20251008-092421.thumb.webp",
-    "full": "/images/20251008-092421.webp",
-    "width": 1600,
-    "height": 3730
-  },
-  {
-    "slug": "img-20251130-wa0009",
-    "title": "“Family” Bear Puzzle",
-    "category": "Family Keepsakes",
-    "alt": "Framed wooden sign reading Family with a cursive title and a bear family puzzle engraved with the names Mounika, Saranika, Vraj, and Vijay, sitting in grass.",
-    "thumb": "/images/img-20251130-wa0009.thumb.webp",
-    "full": "/images/img-20251130-wa0009.webp",
-    "width": 1536,
-    "height": 2040
-  },
-  {
-    "slug": "one",
-    "title": "“Nadendla” Elephant Family Puzzle",
-    "category": "Family Keepsakes",
-    "alt": "Framed wood sign reading Nadendla with a hand-painted elephant family puzzle labeled Nanna, Amma, Anirudh, and Akshith.",
-    "thumb": "/images/one.thumb.webp",
-    "full": "/images/one.webp",
-    "width": 1184,
-    "height": 1516
-  },
-  {
-    "slug": "original-21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55-pxl-20260126-225639459-night",
-    "title": "“Potturi” Family Trio · Puzzle, Hand Circle & Keychain",
-    "category": "Family Keepsakes",
-    "alt": "Three personalized Potturi family gifts on a teal cloth: a circular hand-holding engraving, a Rithikaa keychain, and a framed elephant family puzzle.",
-    "thumb": "/images/original-21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55-pxl-20260126-225639459-night.thumb.webp",
-    "full": "/images/original-21d4f7bf-1a1a-4cae-ba2b-c3079caaaf55-pxl-20260126-225639459-night.webp",
-    "width": 1600,
-    "height": 1198
-  },
-  {
-    "slug": "pxl-20250210-022033451-mp-2",
-    "title": "Bear Family Puzzle · Amma, Nanna, Kaathyayini & Kaundinya",
-    "category": "Family Keepsakes",
-    "alt": "Light wood interlocking bear family puzzle with a red heart, engraved with Amma, Nanna, Kaathyayini, and Kaundinya.",
-    "thumb": "/images/pxl-20250210-022033451-mp-2.thumb.webp",
-    "full": "/images/pxl-20250210-022033451-mp-2.webp",
-    "width": 1600,
-    "height": 1092
-  },
-  {
     "slug": "pxl-20251101-222606965-portrait",
     "title": "“The Yadavalli Family” Nameplate",
     "category": "Family Keepsakes",
@@ -82,16 +22,6 @@ export const photos: readonly Photo[] = [
     "full": "/images/pxl-20251101-222606965-portrait.webp",
     "width": 1600,
     "height": 902
-  },
-  {
-    "slug": "screenshot-20250217-125534-2",
-    "title": "“Mum, You Are the Piece That Holds Us Together” Puzzle Plaque",
-    "category": "Family Keepsakes",
-    "alt": "Framed wooden plaque reading Mum You Are The Piece That Holds Us Together, with an interlocking puzzle piece arrangement engraved with the names Dad, Mum, Jack, Carol, and Arlene.",
-    "thumb": "/images/screenshot-20250217-125534-2.thumb.webp",
-    "full": "/images/screenshot-20250217-125534-2.webp",
-    "width": 1008,
-    "height": 1105
   },
   {
     "slug": "screenshot-20250217-130945",
@@ -144,26 +74,6 @@ export const photos: readonly Photo[] = [
     "height": 917
   },
   {
-    "slug": "pxl-20240824-182850731",
-    "title": "“Kaundinya” Script Nameplate",
-    "category": "Nameplates",
-    "alt": "Black rectangular tag with a raised light-wood cursive engraving of the name Kaundinya.",
-    "thumb": "/images/pxl-20240824-182850731.thumb.webp",
-    "full": "/images/pxl-20240824-182850731.webp",
-    "width": 1600,
-    "height": 1028
-  },
-  {
-    "slug": "pxl-20250405-060244840",
-    "title": "“Hadrian” Dinosaur Shadow Box + Keychains",
-    "category": "Nameplates",
-    "alt": "Framed shadowbox spelling HADRIAN in bold red-outlined letters filled with dinosaur silhouettes, paired with cursive Praju and Snigdha keychains.",
-    "thumb": "/images/pxl-20250405-060244840.thumb.webp",
-    "full": "/images/pxl-20250405-060244840.webp",
-    "width": 1600,
-    "height": 902
-  },
-  {
     "slug": "pxl-20250411-201822209-portrait-original",
     "title": "“KAUNDINYA” Sports-Themed Block Letters",
     "category": "Nameplates",
@@ -182,36 +92,6 @@ export const photos: readonly Photo[] = [
     "full": "/images/nardo-s-coaster.webp",
     "width": 1599,
     "height": 1066
-  },
-  {
-    "slug": "pxl-20240723-215800447-mp",
-    "title": "“KA Studios” Slate Coaster",
-    "category": "Coasters",
-    "alt": "Square dark slate coaster laser-etched with a KA Studios logo, resting on crinkled kraft packaging.",
-    "thumb": "/images/pxl-20240723-215800447-mp.thumb.webp",
-    "full": "/images/pxl-20240723-215800447-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20240727-001158286",
-    "title": "Yelagandula Monogram Slate Coaster",
-    "category": "Coasters",
-    "alt": "Round dark slate coaster engraved with a large letter Y and the name Yelagandula framed by leaves.",
-    "thumb": "/images/pxl-20240727-001158286.thumb.webp",
-    "full": "/images/pxl-20240727-001158286.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20240902-235129690",
-    "title": "“A · Alison” Monogram Slate Coaster",
-    "category": "Coasters",
-    "alt": "Round dark slate coaster engraved with a large letter A over the name Alison surrounded by floral vines.",
-    "thumb": "/images/pxl-20240902-235129690.thumb.webp",
-    "full": "/images/pxl-20240902-235129690.webp",
-    "width": 1600,
-    "height": 900
   },
   {
     "slug": "pxl-20250412-132523460-portrait-original",
@@ -264,16 +144,6 @@ export const photos: readonly Photo[] = [
     "height": 776
   },
   {
-    "slug": "pxl-20241219-044209400-portrait",
-    "title": "“Manu” Poem Ornament",
-    "category": "Ornaments",
-    "alt": "Round wooden Christmas ornament engraved with a poem for Manu, hanging in front of a plush Santa figure.",
-    "thumb": "/images/pxl-20241219-044209400-portrait.thumb.webp",
-    "full": "/images/pxl-20241219-044209400-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
     "slug": "pxl-20241219-214457372",
     "title": "“Scarlet” Snowflake Bauble",
     "category": "Ornaments",
@@ -282,76 +152,6 @@ export const photos: readonly Photo[] = [
     "full": "/images/pxl-20241219-214457372.webp",
     "width": 1600,
     "height": 2844
-  },
-  {
-    "slug": "pxl-20241220-194630937-mp",
-    "title": "“Lidia” Snowflake Bauble",
-    "category": "Ornaments",
-    "alt": "Wooden circular Lidia ornament with snowflake cutouts hanging on a Christmas tree with warm fairy lights.",
-    "thumb": "/images/pxl-20241220-194630937-mp.thumb.webp",
-    "full": "/images/pxl-20241220-194630937-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20241220-194910438-mp",
-    "title": "“Kade” Snowflake Bauble",
-    "category": "Ornaments",
-    "alt": "Wooden circular Kade ornament with snowflake cutouts hanging on a Christmas tree with warm fairy lights.",
-    "thumb": "/images/pxl-20241220-194910438-mp.thumb.webp",
-    "full": "/images/pxl-20241220-194910438-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20241220-195040934-mp",
-    "title": "“Everett” Snowflake Bauble",
-    "category": "Ornaments",
-    "alt": "Wooden circular Everett ornament with snowflake cutouts hanging on a lit Christmas tree.",
-    "thumb": "/images/pxl-20241220-195040934-mp.thumb.webp",
-    "full": "/images/pxl-20241220-195040934-mp.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20241220-202205469-mp-3",
-    "title": "Snowflake Bauble Set (9 Names)",
-    "category": "Ornaments",
-    "alt": "Nine wooden snowflake ornaments arranged in two rows, personalized with the names Aiden, Scarlett, Harper, Everett, Evelyn, Lidia, Maverick, Ava, and Kade.",
-    "thumb": "/images/pxl-20241220-202205469-mp-3.thumb.webp",
-    "full": "/images/pxl-20241220-202205469-mp-3.webp",
-    "width": 1600,
-    "height": 825
-  },
-  {
-    "slug": "pxl-20241220-205745032-mp-3",
-    "title": "Snowflake Bauble Set (5 Names)",
-    "category": "Ornaments",
-    "alt": "Five wooden snowflake baubles in a row, personalized with the names Mishika, Yuvan, Ronak, Ruhin, and Riona.",
-    "thumb": "/images/pxl-20241220-205745032-mp-3.thumb.webp",
-    "full": "/images/pxl-20241220-205745032-mp-3.webp",
-    "width": 1600,
-    "height": 592
-  },
-  {
-    "slug": "pxl-20251206-185854801-3",
-    "title": "Cocoa Mug, Sweater & Beanie Ornaments",
-    "category": "Ornaments",
-    "alt": "Four wooden Christmas ornaments shaped like a cocoa mug, sweaters, and a beanie, personalized with the names Vijay, Mounika, Viraj, and Saranika.",
-    "thumb": "/images/pxl-20251206-185854801-3.thumb.webp",
-    "full": "/images/pxl-20251206-185854801-3.webp",
-    "width": 1600,
-    "height": 2007
-  },
-  {
-    "slug": "pxl-20251214-014445258",
-    "title": "Ugly-Sweater Ornaments (5 Names)",
-    "category": "Ornaments",
-    "alt": "Five wooden ugly-sweater Christmas ornaments on red strings, personalized with the names Kishore, Ramya, Vishwak, Chinu, and Srivarshika.",
-    "thumb": "/images/pxl-20251214-014445258.thumb.webp",
-    "full": "/images/pxl-20251214-014445258.webp",
-    "width": 1600,
-    "height": 1601
   },
   {
     "slug": "pxl-20251216-000312017-2",
@@ -364,16 +164,6 @@ export const photos: readonly Photo[] = [
     "height": 1091
   },
   {
-    "slug": "pxl-20251219-125918327",
-    "title": "Teacher Appreciation Ornament Set (8)",
-    "category": "Ornaments",
-    "alt": "Eight rectangular layered wood ornaments personalized for teachers with colorful backing and names such as Mr. Karnowski, Mr. Dunavant, Mr. Lehman, Mrs. O’Malley, Coach Kistler, Mrs. Kronitz, Mrs. Katie, and Mr. D.",
-    "thumb": "/images/pxl-20251219-125918327.thumb.webp",
-    "full": "/images/pxl-20251219-125918327.webp",
-    "width": 1600,
-    "height": 1482
-  },
-  {
     "slug": "pxl-20251219-130153169-2",
     "title": "Teacher Ornaments for Kistler, Mr. D & Lehman",
     "category": "Ornaments",
@@ -382,46 +172,6 @@ export const photos: readonly Photo[] = [
     "full": "/images/pxl-20251219-130153169-2.webp",
     "width": 1600,
     "height": 1099
-  },
-  {
-    "slug": "pxl-20251219-130212788",
-    "title": "Teacher Ornaments for Kronitz, Dunavant & Katie",
-    "category": "Ornaments",
-    "alt": "Three rectangular teacher ornaments personalized for Mrs. Kronitz, Mr. Dunavant, and Mrs. Katie, resting on a knitted red sweater.",
-    "thumb": "/images/pxl-20251219-130212788.thumb.webp",
-    "full": "/images/pxl-20251219-130212788.webp",
-    "width": 1600,
-    "height": 1017
-  },
-  {
-    "slug": "pxl-20251219-130236511",
-    "title": "Teacher Ornaments for Dunavant, Karnowski & O’Malley",
-    "category": "Ornaments",
-    "alt": "Three teacher appreciation ornaments for Mr. Dunavant, Mr. Karnowski, and Mrs. O’Malley on a red sweater background.",
-    "thumb": "/images/pxl-20251219-130236511.thumb.webp",
-    "full": "/images/pxl-20251219-130236511.webp",
-    "width": 1600,
-    "height": 1056
-  },
-  {
-    "slug": "pxl-20251219-130554466-2",
-    "title": "Teacher Sweater Ornaments · Kronitz, O’Malley, Dunavant & Lehman",
-    "category": "Ornaments",
-    "alt": "Four wooden Christmas sweater ornaments personalized with the teacher names Mrs. Kronitz, Mrs. O’Malley, Mr. Dunavant, and Mr. Lehman, arranged on a red knitted sweater background.",
-    "thumb": "/images/pxl-20251219-130554466-2.thumb.webp",
-    "full": "/images/pxl-20251219-130554466-2.webp",
-    "width": 1600,
-    "height": 1291
-  },
-  {
-    "slug": "pxl-20251219-130639148-2",
-    "title": "Teacher Sweater & Mug Trio",
-    "category": "Ornaments",
-    "alt": "Three teacher ornaments shaped like a Christmas sweater for Mr. D, a cocoa mug for Coach Kistler, and a snowflake sweater for Mrs. O’Malley on a red background.",
-    "thumb": "/images/pxl-20251219-130639148-2.thumb.webp",
-    "full": "/images/pxl-20251219-130639148-2.webp",
-    "width": 1600,
-    "height": 782
   },
   {
     "slug": "pxl-20251219-131635184-2",
@@ -434,16 +184,6 @@ export const photos: readonly Photo[] = [
     "height": 1059
   },
   {
-    "slug": "screenshot-20250218-212455",
-    "title": "“Amela + Josh” Reindeer Couple",
-    "category": "Ornaments",
-    "alt": "Round wooden ornament of two reindeer facing each other with a small heart above and the engraving Amela + Josh 2023.",
-    "thumb": "/images/screenshot-20250218-212455.thumb.webp",
-    "full": "/images/screenshot-20250218-212455.webp",
-    "width": 948,
-    "height": 620
-  },
-  {
     "slug": "keychain",
     "title": "Script-Name Keychains Collection",
     "category": "Keychains",
@@ -452,36 +192,6 @@ export const photos: readonly Photo[] = [
     "full": "/images/keychain.webp",
     "width": 1390,
     "height": 1064
-  },
-  {
-    "slug": "pxl-20250210-215749706-mp-3",
-    "title": "Valentine’s Animal Tokens Collection",
-    "category": "Keychains",
-    "alt": "A dozen small laser-cut wood animal tokens including a sloth, monkey, cat, dinosaur, raccoon, giraffe, and others, several holding small red hearts.",
-    "thumb": "/images/pxl-20250210-215749706-mp-3.thumb.webp",
-    "full": "/images/pxl-20250210-215749706-mp-3.webp",
-    "width": 1600,
-    "height": 2433
-  },
-  {
-    "slug": "pxl-20250419-014533954-portrait",
-    "title": "Name Keychains with Buddha Idol",
-    "category": "Keychains",
-    "alt": "A smiling carved wooden Buddha idol behind rows of cursive wood keychains reading Aishani, Abhirami, Amoolya, Agastya, Nivaan, Atulith, Samanvi, and Shourya.",
-    "thumb": "/images/pxl-20250419-014533954-portrait.thumb.webp",
-    "full": "/images/pxl-20250419-014533954-portrait.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20250419-015305351-mp",
-    "title": "Large Collection of Script Keychains",
-    "category": "Keychains",
-    "alt": "Dozens of cursive wooden name keychains laid out in rows with metal clasps, each engraved with a different personalized name.",
-    "thumb": "/images/pxl-20250419-015305351-mp.thumb.webp",
-    "full": "/images/pxl-20250419-015305351-mp.webp",
-    "width": 1600,
-    "height": 900
   },
   {
     "slug": "pxl-20250421-000314689-mp",
@@ -494,46 +204,6 @@ export const photos: readonly Photo[] = [
     "height": 902
   },
   {
-    "slug": "screenshot-20250209-215032-2",
-    "title": "Mini Animal Keychain Collection",
-    "category": "Keychains",
-    "alt": "A grid of tiny wooden animal keychains including hedgehogs, cats, elephants, and squirrels, each attached to a key ring.",
-    "thumb": "/images/screenshot-20250209-215032-2.thumb.webp",
-    "full": "/images/screenshot-20250209-215032-2.webp",
-    "width": 1008,
-    "height": 1202
-  },
-  {
-    "slug": "img-1341",
-    "title": "Buddha Idol with “Hadrian” Nameplate",
-    "category": "Devotional",
-    "alt": "Carved wooden Buddha figurine paired with a cursive Hadrian nameplate on a white background.",
-    "thumb": "/images/img-1341.thumb.webp",
-    "full": "/images/img-1341.webp",
-    "width": 1600,
-    "height": 2400
-  },
-  {
-    "slug": "pxl-20250928-151402794",
-    "title": "Durga Devi Name Keychains (Set of 9)",
-    "category": "Devotional",
-    "alt": "Nine wooden keychains in a row, each engraved with the face of Durga Devi and personalized with a different name including Aishani, Abhirami, Amoolya, Niharika, Sloka, Disha, Samanvi, Aadya, and Kridha.",
-    "thumb": "/images/pxl-20250928-151402794.thumb.webp",
-    "full": "/images/pxl-20250928-151402794.webp",
-    "width": 1600,
-    "height": 406
-  },
-  {
-    "slug": "pxl-20251206-192152250-portrait-original",
-    "title": "Lord Shiva Name Keychain Batch",
-    "category": "Devotional",
-    "alt": "A group of wooden keychains each engraved with an image of Lord Shiva and personalized names of family members.",
-    "thumb": "/images/pxl-20251206-192152250-portrait-original.thumb.webp",
-    "full": "/images/pxl-20251206-192152250-portrait-original.webp",
-    "width": 1600,
-    "height": 1205
-  },
-  {
     "slug": "pxl-20251206-192331330-portrait-original",
     "title": "Lord Shiva Keychains in Red Presentation Box",
     "category": "Devotional",
@@ -544,52 +214,12 @@ export const photos: readonly Photo[] = [
     "height": 1887
   },
   {
-    "slug": "pxl-20261018-143138737-mp",
-    "title": "Durga Face Keychain Collection",
-    "category": "Devotional",
-    "alt": "A grouping of ornately carved wooden Durga Devi face keychains personalized with names such as Disha and Sreshta.",
-    "thumb": "/images/pxl-20261018-143138737-mp.thumb.webp",
-    "full": "/images/pxl-20261018-143138737-mp.webp",
-    "width": 1600,
-    "height": 902
-  },
-  {
     "slug": "pxl-20261018-143200900-portrait",
     "title": "“Samanvi” Durga Keychain Close-Up",
     "category": "Devotional",
     "alt": "Close-up of a wooden Durga Devi face keychain with ornate carved halo and the name Samanvi on the flat base tag.",
     "thumb": "/images/pxl-20261018-143200900-portrait.thumb.webp",
     "full": "/images/pxl-20261018-143200900-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "slug": "pxl-20261018-143207001-portrait",
-    "title": "“Sreshta” Durga Keychain Close-Up",
-    "category": "Devotional",
-    "alt": "Detailed wooden keychain carved with a Durga Devi face and the name Sreshta on the base tag.",
-    "thumb": "/images/pxl-20261018-143207001-portrait.thumb.webp",
-    "full": "/images/pxl-20261018-143207001-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "slug": "pxl-20261018-143229419-portrait",
-    "title": "“Disha” Durga Keychain",
-    "category": "Devotional",
-    "alt": "A wooden Durga Devi face keychain hanging in front of a softly blurred indoor background, personalized with the name Disha.",
-    "thumb": "/images/pxl-20261018-143229419-portrait.thumb.webp",
-    "full": "/images/pxl-20261018-143229419-portrait.webp",
-    "width": 1600,
-    "height": 2837
-  },
-  {
-    "slug": "pxl-20261018-143307446-portrait",
-    "title": "“Disha” Durga Keychain Held",
-    "category": "Devotional",
-    "alt": "A fingertip holds up a wooden Durga Devi face keychain engraved with the name Disha.",
-    "thumb": "/images/pxl-20261018-143307446-portrait.thumb.webp",
-    "full": "/images/pxl-20261018-143307446-portrait.webp",
     "width": 1600,
     "height": 2837
   },
@@ -624,32 +254,12 @@ export const photos: readonly Photo[] = [
     "height": 902
   },
   {
-    "slug": "pxl-20250321-021323243",
-    "title": "“Maiyur Krishna” Birth Announcement Disc",
-    "category": "Milestones",
-    "alt": "Large round wooden plaque engraved with an ornate letter M featuring a Krishna flute and peacock feather, over Born Feb 24th 2025 3:12 am, Weight 5lb, Height 18.5 inches, and the name Maiyur Krishna, with traditional Indian artwork in the background.",
-    "thumb": "/images/pxl-20250321-021323243.thumb.webp",
-    "full": "/images/pxl-20250321-021323243.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
     "slug": "pxl-20250426-200542845",
     "title": "“Hello World” Birth Announcement Disc",
     "category": "Milestones",
     "alt": "Round wood plaque reading Hello World, personalized with name Dante Blayze Valentino Cooke, date Oct 1 2019, weight 6 oz, time 1:34 AM, height 8 inches, with baby feet and hand graphics.",
     "thumb": "/images/pxl-20250426-200542845.thumb.webp",
     "full": "/images/pxl-20250426-200542845.webp",
-    "width": 1600,
-    "height": 900
-  },
-  {
-    "slug": "pxl-20250426-200623528",
-    "title": "Birth Announcement Disc · Close-Up",
-    "category": "Milestones",
-    "alt": "Close-up of the Hello World birth announcement wood disc showing the engraved name Dante Blayze Valentino Cooke and birth details.",
-    "thumb": "/images/pxl-20250426-200623528.thumb.webp",
-    "full": "/images/pxl-20250426-200623528.webp",
     "width": 1600,
     "height": 900
   },
@@ -674,26 +284,6 @@ export const photos: readonly Photo[] = [
     "height": 2125
   },
   {
-    "slug": "screenshot-20250218-210442",
-    "title": "“Frank & Jenna” Mountain Ornament",
-    "category": "Milestones",
-    "alt": "Round wooden ornament with layered pine trees and mountains, engraved Let The Adventure Begin Frank & Jenna Established 2023.",
-    "thumb": "/images/screenshot-20250218-210442.thumb.webp",
-    "full": "/images/screenshot-20250218-210442.webp",
-    "width": 876,
-    "height": 853
-  },
-  {
-    "slug": "screenshot-20250218-210523",
-    "title": "“Kaitlyn & Michael” Engaged 2023 Mountain Ornament",
-    "category": "Milestones",
-    "alt": "Round wooden ornament with a layered mountain and tree scene, engraved Our Adventure Awaits Kaitlyn & Michael Engaged 2023.",
-    "thumb": "/images/screenshot-20250218-210523.thumb.webp",
-    "full": "/images/screenshot-20250218-210523.webp",
-    "width": 737,
-    "height": 711
-  },
-  {
     "slug": "screenshot-20250218-212339",
     "title": "“Elizabeth & Jonathan” Engagement Plaque",
     "category": "Milestones",
@@ -714,26 +304,6 @@ export const photos: readonly Photo[] = [
     "height": 2400
   },
   {
-    "slug": "pxl-20260218-133551672",
-    "title": "“New York” Skyline Two-Panel Wall Art",
-    "category": "Wall Art",
-    "alt": "Two black rectangular wall panels forming a continuous New York skyline cutout in natural wood, with the Statue of Liberty and tall buildings.",
-    "thumb": "/images/pxl-20260218-133551672.thumb.webp",
-    "full": "/images/pxl-20260218-133551672.webp",
-    "width": 1600,
-    "height": 1205
-  },
-  {
-    "slug": "screenshot-20250218-212655",
-    "title": "“Kathrine & Alexander” Lovebirds Art",
-    "category": "Wall Art",
-    "alt": "Framed wooden art piece showing two silhouetted birds on a branch under a small red heart, engraved Kathrine & Alexander.",
-    "thumb": "/images/screenshot-20250218-212655.thumb.webp",
-    "full": "/images/screenshot-20250218-212655.webp",
-    "width": 738,
-    "height": 736
-  },
-  {
     "slug": "whatsapp-image-2026-11-20-at-1-14-19-pm",
     "title": "“Mt. Rainier, WA” Layered Wall Piece",
     "category": "Wall Art",
@@ -742,26 +312,6 @@ export const photos: readonly Photo[] = [
     "full": "/images/whatsapp-image-2026-11-20-at-1-14-19-pm.webp",
     "width": 1600,
     "height": 555
-  },
-  {
-    "slug": "pxl-20240618-194557596",
-    "title": "“#1 Dad” Insulated Tumbler",
-    "category": "Home & Kitchen",
-    "alt": "Tall white insulated tumbler engraved with a #1 Dad medallion design, displayed on a wooden surface.",
-    "thumb": "/images/pxl-20240618-194557596.thumb.webp",
-    "full": "/images/pxl-20240618-194557596.webp",
-    "width": 1600,
-    "height": 2844
-  },
-  {
-    "slug": "pxl-20240705-235513124",
-    "title": "“Ashwath” Chennai Super Kings Bottle",
-    "category": "Home & Kitchen",
-    "alt": "Tall blue aluminum water bottle engraved with the cursive name Ashwath, a Real Madrid crest, and a Chennai Super Kings lion logo.",
-    "thumb": "/images/pxl-20240705-235513124.thumb.webp",
-    "full": "/images/pxl-20240705-235513124.webp",
-    "width": 1600,
-    "height": 2844
   },
   {
     "slug": "pxl-20251201-013926763-portrait",

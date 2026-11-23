@@ -6,6 +6,7 @@ import { Contact } from "./components/Contact";
 import { Footer } from "./components/Footer";
 import { BackToTop } from "./components/BackToTop";
 import { OrdersRoot } from "./modules/orders/OrdersRoot";
+import { ReviewsRoot } from "./modules/reviews/ReviewsRoot";
 
 export default function App() {
   return (
@@ -19,12 +20,16 @@ export default function App() {
       <Nav />
       <OrdersRoot
         fallback={
-          <main>
-            <Hero />
-            <About />
-            <Gallery />
-            <Contact />
-          </main>
+          <ReviewsRoot
+            fallback={
+              <main>
+                <Hero />
+                <About />
+                <Gallery />
+                <Contact />
+              </main>
+            }
+          />
         }
       />
       <Footer />

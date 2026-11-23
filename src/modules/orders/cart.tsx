@@ -20,9 +20,51 @@ function newId(): string {
   return `ci_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
+const MAX_QUANTITY = 99;
+
+// Normalize text for duplicate detection: trim + collapse internal whitespace;
+// treat empty string and undefined as the same canonical "". Case is preserved —
+// engraving case can be intentional (e.g. "SMITH FAMILY" vs "Smith Family").
+function normalizeForMatch(s: string | undefined | null): string {
+  return (s ?? "").replace(/\s+/g, " ").trim();
+}
+
+function sameCartConfiguration(
+  incoming: Omit<CartItem, "id" | "addedAt">,
+  existing: CartItem,
+): boolean {
+  if (incoming.designId !== existing.designId) return false;
+  if (incoming.variantId !== existing.variantId) return false;
+  if (
+    normalizeForMatch(incoming.customization.engravingText) !==
+    normalizeForMatch(existing.customization.engravingText)
+  )
+    return false;
+  if (
+    normalizeForMatch(incoming.customization.occasionNote) !==
+    normalizeForMatch(existing.customization.occasionNote)
+  )
+    return false;
+  return true;
+}
+
 function reducer(state: Cart, action: Action): Cart {
   switch (action.type) {
     case "add": {
+      const match = state.items.find((it) => sameCartConfiguration(action.item, it));
+      if (match) {
+        // Merge: bump quantity on the existing line (capped at MAX_QUANTITY).
+        const nextQty = Math.min(
+          MAX_QUANTITY,
+          match.quantity + action.item.quantity,
+        );
+        return {
+          ...state,
+          items: state.items.map((it) =>
+            it.id === match.id ? { ...it, quantity: nextQty } : it,
+          ),
+        };
+      }
       const item: CartItem = { ...action.item, id: newId(), addedAt: Date.now() };
       return { ...state, items: [...state.items, item] };
     }
