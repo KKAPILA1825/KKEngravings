@@ -94,6 +94,16 @@ export const photos: readonly Photo[] = [
     "height": 1066
   },
   {
+    "slug": "pxl-20240723-215743241-mp",
+    "title": "“KA Studios” Slate Coaster · Alt Angle",
+    "category": "Coasters",
+    "alt": "Dark slate coaster laser-etched with a KA Studios logo, photographed from a second angle.",
+    "thumb": "/images/pxl-20240723-215743241-mp.thumb.webp",
+    "full": "/images/pxl-20240723-215743241-mp.webp",
+    "width": 1600,
+    "height": 1858
+  },
+  {
     "slug": "pxl-20250412-132523460-portrait-original",
     "title": "Tree-of-Life Slate Coaster",
     "category": "Coasters",
@@ -172,6 +182,16 @@ export const photos: readonly Photo[] = [
     "full": "/images/pxl-20251219-130153169-2.webp",
     "width": 1600,
     "height": 1099
+  },
+  {
+    "slug": "pxl-20251219-130236511",
+    "title": "Teacher Ornaments for Dunavant, Karnowski & O’Malley",
+    "category": "Ornaments",
+    "alt": "Three teacher appreciation ornaments for Mr. Dunavant, Mr. Karnowski, and Mrs. O’Malley on a red sweater background.",
+    "thumb": "/images/pxl-20251219-130236511.thumb.webp",
+    "full": "/images/pxl-20251219-130236511.webp",
+    "width": 1600,
+    "height": 1056
   },
   {
     "slug": "pxl-20251219-131635184-2",

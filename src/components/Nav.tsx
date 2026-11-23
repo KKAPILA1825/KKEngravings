@@ -62,11 +62,9 @@ export function Nav() {
             aria-label={`${site.name} — home`}
           >
             <img
-              src="/kk-logo-horizontal.webp"
+              src="/kk-logo.svg"
               alt={site.name}
-              width={600}
-              height={200}
-              className="h-10 w-auto sm:h-12 rounded-sm"
+              className="h-10 w-auto sm:h-12"
               decoding="async"
             />
             {/* <span>{site.name}</span> */}
