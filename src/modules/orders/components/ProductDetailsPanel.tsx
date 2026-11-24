@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, ShoppingBag } from "lucide-react";
 import type { Design } from "../types";
 import { variantsFor } from "../data/variants";
+import { getPricing } from "../data/pricing";
 import { useCart } from "../cart";
 
 const inputCls =
@@ -83,9 +84,33 @@ export function ProductDetailsPanel({ design, onViewCart }: Props) {
         <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-[var(--color-walnut-dark)]">
           {design.title}
         </h2>
-        <p className="mt-2 text-sm text-[var(--color-charcoal-soft)]/80">
-          Price to be confirmed by KK Engravings after review.
-        </p>
+        {(() => {
+          const pricing = getPricing(design.id);
+          if (!pricing) {
+            return (
+              <p className="mt-2 text-sm text-[var(--color-charcoal-soft)]/80">
+                Price to be confirmed by KK Engravings after review.
+              </p>
+            );
+          }
+          return (
+            <div className="mt-3 space-y-0.5">
+              <p className="font-serif text-2xl text-[var(--color-walnut-dark)]">
+                {pricing.price}
+              </p>
+              {pricing.dimensions && (
+                <p className="text-sm text-[var(--color-charcoal-soft)]">
+                  {pricing.dimensions}
+                </p>
+              )}
+              {pricing.priceNote && (
+                <p className="text-xs italic text-[var(--color-charcoal-soft)]/80">
+                  {pricing.priceNote}
+                </p>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/*
